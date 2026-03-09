@@ -170,15 +170,23 @@ export default function Sidebar() {
 
     return (
         <>
-            <header className="lg:hidden sticky top-0 left-0 w-full z-40 bg-background/80 backdrop-blur-md border-b border-border px-4 h-16 flex items-center justify-between">
+            <header className="lg:hidden sticky top-0 left-0 w-full z-40 bg-background backdrop-blur-md border-b border-border px-4 h-16 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setIsOpen(true)}
-                        className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                        className="p-2 hover:bg-neutral rounded-lg transition-colors"
                     >
                         <Menu size={24} />
                     </button>
+                    <span className="font-bold text-foreground">AppDev Central</span>
                 </div>
+                <Avatar
+                    src={user?.GAvatar}
+                    size={32}
+                    className="bg-accent-1 text-white font-bold shadow-sm"
+                >
+                    {user?.AccountName?.charAt(0) || 'U'}
+                </Avatar>
             </header>
 
             <div
@@ -188,7 +196,7 @@ export default function Sidebar() {
                 )}
             >
                 <div
-                    className="absolute inset-0 bg-     /20 backdrop-blur-sm"
+                    className="absolute inset-0 bg-black/40 backdrop-blur-sm"
                     onClick={() => setIsOpen(false)}
                 ></div>
                 <div className="absolute left-0 top-0 h-full w-[280px] bg-white shadow-2xl overflow-hidden">
