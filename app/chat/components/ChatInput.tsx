@@ -71,9 +71,10 @@ export function ChatInput({
                         >
                             {inputValue.trim() ? <ArrowUp size={20} /> : (
                                 <div className="flex items-center gap-[2px]">
-                                    <div className="w-[3px] h-3 bg-white rounded-full animate-pulse" />
+                                    <div className="w-[3px] h-2 bg-white rounded-full animate-pulse" />
                                     <div className="w-[3px] h-5 bg-white rounded-full animate-pulse delay-75" />
                                     <div className="w-[3px] h-3 bg-white rounded-full animate-pulse delay-150" />
+                                    <div className="w-[2px] h-2 bg-white rounded-full animate-pulse delay-225" />
                                 </div>
                             )}
                         </button>
