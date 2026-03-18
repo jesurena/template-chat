@@ -30,7 +30,7 @@ export function useChat() {
             Text: prompt,
             IsUser: true,
             Timestamp: new Date().toISOString(),
-            Status: 'delivered'
+            Status: 'sent'
         };
 
         const aiMsg: ChatMessage = {
@@ -134,6 +134,22 @@ export function useChat() {
                 return updated;
             });
         } finally {
+            setMessages(prev => {
+                const updated = [...prev];
+
+                for (let index = updated.length - 1; index >= 0; index--) {
+                    if (updated[index].IsUser) {
+                        updated[index] = {
+                            ...updated[index],
+                            Status: 'delivered'
+                        };
+                        break;
+                    }
+                }
+
+                return updated;
+            });
+
             setIsTyping(false);
             abortControllerRef.current = null;
         }

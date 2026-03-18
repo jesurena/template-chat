@@ -48,6 +48,7 @@ export function ChatInput({
     const [isPopoverOpen, setIsPopoverOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
     React.useEffect(() => {
         setMounted(true);
@@ -124,7 +125,7 @@ export function ChatInput({
     );
 
     return (
-        <div className="w-full bg-chat-bg transition-all duration-500 pb-2 pt-2 border-t border-border/20 shadow-[0_-4px_12px_-4px_rgba(0,0,0,0.05)]">
+        <div className="w-full bg-chat-bg transition-all duration-500 pb-2">
             <div className="max-w-4xl mx-auto px-4 relative flex flex-col items-center">
                 <div className={cn(
                     "relative flex flex-col w-full bg-neutral border border-border rounded-[26px] p-2 focus-within:border-accent-1 focus-within:ring-1 focus-within:ring-accent-1/20 transition-all duration-500 ease-in-out shadow-sm",
@@ -150,7 +151,20 @@ export function ChatInput({
                         ) : <div />}
 
                         <button
-                            onClick={() => setIsExpanded(!isExpanded)}
+                            onClick={() => {
+                                const nextExpanded = !isExpanded;
+                                setIsExpanded(nextExpanded);
+
+                                if (textareaRef.current) {
+                                    if (nextExpanded) {
+                                        textareaRef.current.style.height = 'auto';
+                                        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+                                    } else {
+                                        textareaRef.current.style.height = 'auto';
+                                        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+                                    }
+                                }
+                            }}
                             className="p-1.5 text-gray-400 hover:text-accent-1 hover:bg-neutral rounded-lg transition-all"
                             title={isExpanded ? "Collapse" : "Expand"}
                         >
@@ -193,6 +207,7 @@ export function ChatInput({
                         )}
 
                         <textarea
+                            ref={textareaRef}
                             rows={1}
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
@@ -207,7 +222,7 @@ export function ChatInput({
                             placeholder={isTyping ? "AI is responding..." : "Ask about project standards..."}
                             className={cn(
                                 "flex-1 bg-transparent border-none focus:ring-0 text-[15px] text-foreground py-3 px-3 resize-none overflow-y-auto outline-none placeholder:text-gray-400/60 transition-all duration-500",
-                                isExpanded ? "h-[400px]" : "min-h-[44px] max-h-[160px]",
+                                isExpanded ? "self-start min-h-[44px] max-h-[400px]" : "min-h-[44px] max-h-[160px]",
                                 isTyping && "opacity-50"
                             )}
                             onInput={(e) => {

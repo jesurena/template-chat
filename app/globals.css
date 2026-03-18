@@ -126,10 +126,6 @@ body {
   font-size: 0.9em;
 }
 
-.dark .chat-markdown code {
-  background: rgba(255, 255, 255, 0.1);
-}
-
 .chat-markdown pre {
   background: rgba(0, 0, 0, 0.06);
   padding: 0.8em 1em;
@@ -143,13 +139,67 @@ body {
   padding: 0;
 }
 
-.dark .chat-markdown pre {
-  background: rgba(255, 255, 0, 0.06);
-}
-
 .chat-markdown blockquote {
   border-left: 3px solid var(--accent-1);
   padding-left: 0.8em;
   margin: 0.6em 0;
   opacity: 0.85;
+}
+
+.chat-markdown table {
+  width: 100%;
+  max-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 10px 0 10px 0;
+  font-size: 0.95rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.chat-markdown thead {
+  background-color: var(--neutral);
+}
+
+.chat-markdown th {
+  font-weight: 600;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid var(--border);
+  color: var(--primary);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.dark .chat-markdown th {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--foreground);
+}
+
+.chat-markdown td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.chat-markdown tr:last-child td {
+  border-bottom: none;
+}
+
+.chat-markdown tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.01);
+}
+
+.dark .chat-markdown tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.01);
+}
+
+.chat-markdown tr:hover {
+  background-color: rgba(22, 119, 255, 0.02);
+}
+
+.dark .chat-markdown tr:hover {
+  background-color: rgba(59, 130, 246, 0.05);
 }
