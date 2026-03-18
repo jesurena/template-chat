@@ -38,7 +38,7 @@ export function QuickQuestions({
     if (!questions || questions.length === 0) return null;
 
     return (
-        <div className="w-full px-6 mb-4 flex flex-col items-center">
+        <div className="w-full px-6 mt-2 flex flex-col items-center">
             <button
                 onClick={() => setShow(!show)}
                 className="text-[10px] tracking-wider font-bold text-gray-400 hover:text-gray-500 flex items-center gap-1.5 transition-colors duration-200 mb-3"
