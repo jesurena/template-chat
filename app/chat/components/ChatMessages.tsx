@@ -4,33 +4,24 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-import {
-    CheckOutlined,
-    RobotOutlined,
-    CopyOutlined,
-    LikeOutlined,
-    DislikeOutlined,
-    ExportOutlined,
-    ReloadOutlined,
-    EllipsisOutlined
+import { 
+    CheckOutlined, 
+    RobotOutlined, 
+    CopyOutlined 
 } from '@ant-design/icons';
 import { Loader2 } from 'lucide-react';
 import { Avatar, Tooltip } from 'antd';
 import { ChatMessage } from '@/interface/Chat';
 import { copyToClipboard } from '@/utils/clipboard';
-
-function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs));
-}
+import { normalizeMarkdown } from '@/utils/markdown';
+import { cn } from '@/utils/cn';
 
 interface ChatMessagesProps {
     messages: ChatMessage[];
     isTyping?: boolean;
 }
 
-import { normalizeMarkdown } from '@/utils/markdown';
+
 
 function PreBlock({ children, ...props }: React.HTMLAttributes<HTMLPreElement>) {
     const preRef = React.useRef<HTMLPreElement>(null);

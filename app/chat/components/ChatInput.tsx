@@ -136,7 +136,7 @@ export function ChatInput({
                         {selectedCompanies.length > 0 ? (
                             <div className="flex flex-wrap gap-2 py-1 max-h-[90px] overflow-y-auto scrollbar-hide pr-2">
                                 {selectedCompanies.map(c => (
-                                    <div key={c.company_name} className="flex items-center gap-1.5 bg-accent-1 text-white px-3 py-1.5 rounded-full text-[12px] font-bold shadow-sm transition-all hover:bg-accent-1/90">
+                                    <div key={c.company_name} className="flex items-center gap-1.5 bg-accent-1 text-white px-3 py-1.5 rounded-full text-[11px] font-bold shadow-sm transition-all hover:bg-accent-1/90">
                                         <span className="truncate max-w-[180px]">{c.company_name}</span>
                                         <button
                                             onClick={(e) => { e.preventDefault(); removeCompany(c.company_name); }}
