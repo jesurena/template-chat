@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChatIntro } from './components/ChatIntro';
 import { ChatInput } from './components/ChatInput';
 import { ChatMessages } from './components/ChatMessages';
-import { QuickQuestions, QuickQuestion } from './components/ChatComponents';
+import { QuickQuestions, QuickQuestion } from './components/ChatQuickQuestions';
 import { GeneratedQuestionsModal, getGeneratedQuestions } from './components/GeneratedQuestionsModal';
 import { DriveConnectModal } from './components/DriveConnectModal';
 import { useChat } from '@/hooks/chat/useChat';
