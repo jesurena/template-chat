@@ -89,10 +89,10 @@ export function ChatIntro({
     return (
         <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
             <div className="text-center mb-10">
-                <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4 tracking-tight">
+                <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-4 tracking-tight">
                     Select Context
                 </h1>
-                <p className="text-gray-600 text-sm md:text-lg max-w-lg mx-auto leading-relaxed">
+                <p className="text-gray-600 text-sm md:text-md max-w-lg mx-auto leading-relaxed">
                     Select a company or client to set the context for our conversation.
                 </p>
             </div>

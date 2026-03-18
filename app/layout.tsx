@@ -2,6 +2,7 @@ import "./globals.css";
 import QueryProvider from "@/components/Providers/query-provider";
 import { ThemeProvider } from "@/components/Providers/theme-provider";
 import { DriveProvider } from "@/components/Providers/drive-provider";
+import { ChatProvider } from "@/hooks/chat/useChat";
 
 export default function RootLayout({
   children,
@@ -14,7 +15,9 @@ export default function RootLayout({
         <ThemeProvider>
           <QueryProvider>
             <DriveProvider>
-              {children}
+              <ChatProvider>
+                {children}
+              </ChatProvider>
             </DriveProvider>
           </QueryProvider>
         </ThemeProvider>

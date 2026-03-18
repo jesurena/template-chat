@@ -12,22 +12,22 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="flex min-h-screen bg-white">
+        <div className="flex min-h-screen bg-background">
             <div className="flex w-full md:w-1/2 lg:w-[45%] flex-col justify-between p-8 sm:p-12 relative z-10">
                 <div>
                     <Link href="/" className="flex items-center gap-2 group w-max">
                         <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform shadow-sm">
                             <span className="text-white font-bold text-xs">AC</span>
                         </div>
-                        <span className="text-xl font-bold text-primary tracking-tight">
+                        <span className="text-xl font-bold text-text tracking-tight">
                             appdev central
                         </span>
                     </Link>
                 </div>
 
                 <div className="flex-1 flex flex-col justify-center w-full max-w-[420px] mx-auto text-center">
-                    <h1 className="text-[34px] font-bold text-gray-900 mb-2.5 tracking-tight">Login your account</h1>
-                    <p className="text-gray-500 mb-10 text-[15px]">
+                    <h1 className="text-[34px] font-bold text-foreground mb-2.5 tracking-tight">Login your account</h1>
+                    <p className="text-gray-500 dark:text-gray-400 mb-10 text-[15px]">
                         Welcome back! Please login with your Google account to access the system.
                     </p>
 
@@ -35,7 +35,7 @@ export default function LoginPage() {
                         <Button
                             onClick={handleGoogleLogin}
                             size="large"
-                            className="flex items-center justify-center w-full gap-3 px-4 py-6 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all font-semibold text-gray-700 hover:border-gray-300 shadow-sm"
+                            className="flex items-center justify-center w-full gap-3 px-4 py-6 border border-border rounded-xl hover:bg-neutral transition-all font-semibold text-foreground hover:border-gray-300 dark:hover:border-gray-600 shadow-sm bg-transparent"
                         >
                             <StackIcon name="google" className="w-5 h-5" />
                             Continue with Google
@@ -43,9 +43,9 @@ export default function LoginPage() {
                     </div>
                 </div>
 
-                <div className="flex justify-between items-center text-[13px] text-gray-400 font-medium">
+                <div className="flex justify-between items-center text-[13px] text-gray-500 dark:text-gray-400 font-medium">
                     <span>Copyright © {new Date().getFullYear()} AppDev Central</span>
-                    <Link href="#" className="hover:text-gray-600 transition-colors">Privacy Policy</Link>
+                    <Link href="#" className="hover:text-foreground transition-colors">Privacy Policy</Link>
                 </div>
             </div>
 

@@ -4,102 +4,129 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
-import { 
-    CheckOutlined, 
-    RobotOutlined, 
-    CopyOutlined 
-} from '@ant-design/icons';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+import { CheckOutlined, RobotOutlined, CopyOutlined } from '@ant-design/icons';
 import { Loader2 } from 'lucide-react';
 import { Avatar, Tooltip } from 'antd';
 import { ChatMessage } from '@/interface/Chat';
 import { copyToClipboard } from '@/utils/clipboard';
-import { normalizeMarkdown } from '@/utils/markdown';
-import { cn } from '@/utils/cn';
+
+function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs));
+}
 
 interface ChatMessagesProps {
     messages: ChatMessage[];
     isTyping?: boolean;
 }
 
+function normalizeMarkdown(text: string) {
+    const normalized = text.replace(/\r\n/g, '\n');
+    const lines = normalized.split('\n');
+    const output: string[] = [];
+    let inCodeFence = false;
 
+    const normalizePipeChars = (line: string) => line.replace(/[｜│┃]/g, '|');
 
-function PreBlock({ children, ...props }: React.HTMLAttributes<HTMLPreElement>) {
-    const preRef = React.useRef<HTMLPreElement>(null);
-    const [language, setLanguage] = React.useState<string | null>(null);
+    const countPipes = (line: string) => (line.match(/\|/g) || []).length;
 
-    React.useEffect(() => {
-        if (preRef.current) {
-            const codeElement = preRef.current.querySelector('code');
-            const className = codeElement?.className || '';
-            const match = /language-(\w+)/.exec(className);
-            if (match) {
-                const lang = match[1];
-                // Map common initials to full names or just capitalize
-                const langMap: Record<string, string> = {
-                    'js': 'JavaScript',
-                    'ts': 'TypeScript',
-                    'tsx': 'TypeScript React',
-                    'jsx': 'JavaScript React',
-                    'py': 'Python',
-                    'cpp': 'C++',
-                    'csharp': 'C#',
-                    'md': 'Markdown',
-                    'html': 'HTML',
-                    'css': 'CSS',
-                    'sh': 'Bash',
-                    'bash': 'Bash',
-                    'zsh': 'Zsh'
-                };
-                setLanguage(langMap[lang.toLowerCase()] || lang.charAt(0).toUpperCase() + lang.slice(1));
-            } else {
-                setLanguage(null);
-            }
-        }
-    }, [children]);
-
-    const handleCopy = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!preRef.current) return;
-
-        const codeElement = preRef.current.querySelector('code');
-        const codeText = codeElement ? codeElement.textContent : preRef.current.textContent;
-
-        copyToClipboard(codeText || '', 'Code');
+    const isPipeRow = (line: string) => {
+        const normalizedLine = normalizePipeChars(line);
+        const trimmed = normalizedLine.trim();
+        return countPipes(trimmed) >= 2 && !trimmed.startsWith('>');
     };
 
-    return (
-        <div className="flex flex-col my-6 overflow-hidden rounded-xl border border-border dark:border-white/5 shadow-sm bg-white dark:bg-[#0b0d11]">
-            {/* Header bar that adjusts to light/dark themes */}
-            <div className="flex items-center justify-between px-5 py-2.5 bg-neutral-50 dark:bg-[#1a1c22] border-b border-border dark:border-white/5">
-                <span className="text-[12px] font-semibold text-neutral-500 dark:text-gray-300 tracking-wide uppercase font-sans">
-                    {language || 'Code Snippet'}
-                </span>
-                <Tooltip title="Copy code">
-                    <button
-                        onClick={handleCopy}
-                        className="flex items-center justify-center p-1.5 rounded-md text-neutral-400 hover:text-accent-1 dark:text-gray-400 dark:hover:text-accent-1 hover:bg-neutral-100 dark:hover:bg-white/5 transition-all cursor-pointer"
-                    >
-                        <CopyOutlined className="text-[15px]" />
-                    </button>
-                </Tooltip>
-            </div>
+    const isSeparatorCell = (cell: string) => /^:?-{3,}:?$/.test(cell.trim());
 
-            {/* Code Body */}
-            <div className="relative overflow-hidden">
-                <pre
-                    ref={preRef}
-                    {...props}
-                    className={cn(
-                        "p-5 overflow-x-auto text-[14px] leading-relaxed text-neutral-700 dark:text-[#e6edf3] font-mono selection:bg-accent-1/30 selection:text-white",
-                        props.className
-                    )}
-                >
-                    {children}
-                </pre>
-            </div>
-        </div>
-    );
+    const toCells = (line: string) => {
+        const trimmed = normalizePipeChars(line).trim();
+        const withoutEdges = trimmed.replace(/^\|/, '').replace(/\|$/, '');
+        return withoutEdges.split('|').map((cell) => cell.trim());
+    };
+
+    const formatRow = (cells: string[], totalColumns: number) => {
+        const padded = [...cells];
+        while (padded.length < totalColumns) {
+            padded.push('');
+        }
+        return `| ${padded.join(' | ')} |`;
+    };
+
+    for (let index = 0; index < lines.length; index++) {
+        const current = lines[index];
+
+        if (current.trim().startsWith('```')) {
+            inCodeFence = !inCodeFence;
+            output.push(current);
+            continue;
+        }
+
+        if (inCodeFence) {
+            output.push(current);
+            continue;
+        }
+
+        if (!isPipeRow(current)) {
+            output.push(current);
+            continue;
+        }
+
+        const block: string[] = [];
+        let cursor = index;
+
+        while (cursor < lines.length) {
+            const candidate = lines[cursor];
+            if (candidate.trim() === '') {
+                cursor += 1;
+                continue;
+            }
+
+            if (!isPipeRow(candidate)) {
+                break;
+            }
+
+            block.push(candidate);
+            cursor += 1;
+        }
+
+        if (block.length < 2) {
+            output.push(current);
+            continue;
+        }
+
+        index = cursor - 1;
+
+        const parsedRows = block.map(toCells);
+        const totalColumns = Math.max(...parsedRows.map((row) => row.length));
+
+        if (totalColumns < 2) {
+            output.push(...block);
+            continue;
+        }
+
+        if (output.length > 0 && output[output.length - 1].trim() !== '') {
+            output.push('');
+        }
+
+        if (parsedRows.length >= 2 && parsedRows[1].every(isSeparatorCell)) {
+            output.push(...parsedRows.map((row) => formatRow(row, totalColumns)));
+            output.push('');
+            continue;
+        }
+
+        const separator = Array.from({ length: totalColumns }, () => '---');
+        output.push(formatRow(parsedRows[0], totalColumns));
+        output.push(formatRow(separator, totalColumns));
+
+        for (let rowIndex = 1; rowIndex < parsedRows.length; rowIndex++) {
+            output.push(formatRow(parsedRows[rowIndex], totalColumns));
+        }
+
+        output.push('');
+    }
+
+    return output.join('\n');
 }
 
 export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
@@ -140,16 +167,20 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
                                         ) : (
                                             <>
                                                 <div className="chat-markdown pr-6">
-                                                    <ReactMarkdown
-                                                        remarkPlugins={[remarkGfm, remarkBreaks]}
-                                                        components={{
-                                                            pre: PreBlock
-                                                        }}
-                                                    >
-                                                        {normalizeMarkdown(msg.Text)}
-                                                    </ReactMarkdown>
+                                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>{normalizeMarkdown(msg.Text)}</ReactMarkdown>
                                                 </div>
-
+                                                {msg.Text && !isTyping && (
+                                                    <div className="absolute top-0 right-[-8px]">
+                                                        <Tooltip title="Copy message">
+                                                            <button
+                                                                onClick={() => copyToClipboard(msg.Text)}
+                                                                className="flex items-center justify-center w-7 h-7 rounded-lg text-text-info hover:text-text-info/80 transition-all cursor-pointer"
+                                                            >
+                                                                <CopyOutlined className="text-[14px]" />
+                                                            </button>
+                                                        </Tooltip>
+                                                    </div>
+                                                )}
                                             </>
                                         )}
                                     </div>
@@ -177,20 +208,10 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
                             </div>
                         </div>
                     ) : (
-                        <div className="flex items-center gap-3 mt-1.5 ml-10 text-gray-400">
-                            <span className="text-[12px] font-medium leading-none">
+                        <div className="flex items-center gap-1.5 px-1 mt-1 ml-10">
+                            <span className="text-[12px] text-gray-400 font-medium">
                                 {mounted && new Date(msg.Timestamp).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
                             </span>
-                            {msg.Text && !isTyping && i !== messages.length && (
-                                <Tooltip title="Copy">
-                                    <button
-                                        onClick={() => copyToClipboard(msg.Text)}
-                                        className="hover:text-accent-1 transition-colors cursor-pointer leading-none flex items-center"
-                                    >
-                                        <CopyOutlined className="text-[14px]" />
-                                    </button>
-                                </Tooltip>
-                            )}
                         </div>
                     )}
                 </div>

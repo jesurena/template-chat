@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Settings, MoreVertical, Menu, X, LogOut, Loader2, Plus, Search, ChevronDown, UserCog, MessageSquare } from 'lucide-react';
 import { Dropdown, Avatar } from 'antd';
 import type { MenuProps } from 'antd';
@@ -30,6 +30,7 @@ function cn(...inputs: ClassValue[]) {
 
 export default function Sidebar() {
     const pathname = usePathname();
+    const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const { user, isLoading } = useAuth();
@@ -115,7 +116,13 @@ export default function Sidebar() {
 
                 <div className="flex flex-col gap-1">
                     <button
-                        onClick={resetChat}
+                        onClick={() => {
+                            resetChat();
+                            if (pathname !== '/chat') {
+                                router.push('/chat');
+                            }
+                            setIsOpen(false);
+                        }}
                         className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-neutral transition-colors w-full"
                     >
                         <Plus size={18} />
@@ -142,6 +149,9 @@ export default function Sidebar() {
                                 key={chat.id}
                                 onClick={() => {
                                     loadChat(chat.messages);
+                                    if (pathname !== '/chat') {
+                                        router.push('/chat');
+                                    }
                                     setIsOpen(false);
                                 }}
                                 className="flex items-center gap-2.5 px-3 py-2 text-sm text-text hover:bg-neutral rounded-lg transition-colors text-left w-full group"
@@ -238,6 +248,9 @@ export default function Sidebar() {
                 onClose={() => setIsSearchModalOpen(false)}
                 onSelectChat={(messages) => {
                     loadChat(messages);
+                    if (pathname !== '/chat') {
+                        router.push('/chat');
+                    }
                     setIsSearchModalOpen(false);
                     setIsOpen(false);
                 }}

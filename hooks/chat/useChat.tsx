@@ -1,9 +1,20 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import React, { createContext, useContext, useState, useRef, ReactNode } from 'react';
 import { ChatMessage } from '@/interface/Chat';
 
-export function useChat() {
+interface ChatContextType {
+    messages: ChatMessage[];
+    isTyping: boolean;
+    sendMessage: (prompt: string) => Promise<void>;
+    stopTyping: () => void;
+    resetChat: () => void;
+    loadChat: (msgs: ChatMessage[]) => void;
+}
+
+const ChatContext = createContext<ChatContextType | undefined>(undefined);
+
+export function ChatProvider({ children }: { children: ReactNode }) {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [isTyping, setIsTyping] = useState(false);
     const abortControllerRef = useRef<AbortController | null>(null);
@@ -155,12 +166,25 @@ export function useChat() {
         }
     };
 
-    return {
-        messages,
-        isTyping,
-        sendMessage,
-        stopTyping,
-        resetChat: () => setMessages([]),
-        loadChat: (msgs: ChatMessage[]) => setMessages(msgs)
-    };
+    return (
+        <ChatContext.Provider value={{
+            messages,
+            isTyping,
+            sendMessage,
+            stopTyping,
+            resetChat: () => setMessages([]),
+            loadChat: (msgs: ChatMessage[]) => setMessages(msgs)
+        }}>
+            {children}
+        </ChatContext.Provider>
+    );
 }
+
+export function useChat() {
+    const context = useContext(ChatContext);
+    if (context === undefined) {
+        throw new Error('useChat must be used within a ChatProvider');
+    }
+    return context;
+}
+
