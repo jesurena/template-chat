@@ -191,7 +191,7 @@ export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, select
 
     const steps = [
         {
-            title: 'Define Focus',
+            title: 'Define Keywords',
             icon: <Target size={18} />,
         },
         {
@@ -204,7 +204,7 @@ export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, select
         <Modal
             title={
                 <div className="flex flex-col gap-4 pb-4">
-                    <div className="flex items-center gap-2 text-lg font-bold text-foreground">
+                    <div className="flex items-center gap-2 mb-4 text-lg font-bold text-foreground">
                         <div className="w-8 h-8 rounded-full bg-accent-1/10 flex items-center justify-center">
                             <Sparkles size={18} className="text-accent-1" />
                         </div>
@@ -273,7 +273,7 @@ export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, select
             className="generated-questions-modal"
         >
             <div className={cn(
-                "py-6 flex flex-col gap-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar transition-all duration-300",
+                "py-2 flex flex-col gap-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar transition-all duration-300",
                 isGenerating && "opacity-40 blur-[1px] pointer-events-none"
             )}>
                 {currentStep === 0 ? (
@@ -314,7 +314,7 @@ export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, select
                                 key={q.id}
                                 onClick={() => setSelectedId(q.id)}
                                 className={cn(
-                                    "cursor-pointer p-5 rounded-2xl border transition-all duration-200 flex flex-col gap-3 relative",
+                                    "cursor-pointer p-4 rounded-2xl border transition-all duration-200 flex flex-col gap-3 relative",
                                     selectedId === q.id
                                         ? "bg-accent-1/[0.04] border-accent-1 shadow-sm ring-1 ring-accent-1/20"
                                         : "border-border hover:border-accent-1/30 hover:bg-neutral shadow-sm"
@@ -325,14 +325,14 @@ export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, select
                                         <Tag
                                             color={categoryColors[q.category] || 'blue'}
                                             variant="solid"
-                                            className="px-3 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase mr-0 border-none"
+                                            className="px-3 py-0.5 rounded-full text-xs font-semibold mr-0 border-none"
                                         >
                                             {q.category}
                                         </Tag>
                                         <Tag
                                             color={q.targetCompany === 'Cross-Company' ? 'gold' : 'default'}
                                             variant={q.targetCompany === 'Cross-Company' ? 'solid' : 'outlined'}
-                                            className="px-3 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase mr-0 whitespace-nowrap"
+                                            className="px-2 py-0.5 rounded-full text-xs font-semibold mr-0 whitespace-nowrap"
                                         >
                                             {q.targetCompany}
                                         </Tag>
@@ -340,7 +340,6 @@ export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, select
 
                                     {selectedId === q.id && (
                                         <div className="flex items-center gap-1.5 text-accent-1 animate-in fade-in zoom-in duration-300">
-                                            <span className="text-[10px] font-bold uppercase tracking-tighter">Selected</span>
                                             <div className="w-5 h-5 rounded-full bg-accent-1 text-white flex items-center justify-center">
                                                 <Check size={12} strokeWidth={3} />
                                             </div>
@@ -348,7 +347,7 @@ export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, select
                                     )}
                                 </div>
 
-                                <p className="text-[15px] font-bold text-foreground leading-relaxed">
+                                <p className="text-sm text-foreground leading-relaxed">
                                     {q.question}
                                 </p>
                             </div>
