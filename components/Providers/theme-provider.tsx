@@ -1,7 +1,31 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { ConfigProvider, theme as antdTheme } from 'antd';
+import { ConfigProvider, theme as antdTheme, App } from 'antd';
+
+let message: any;
+let notification: any;
+let modal: any;
+
+export { message, notification, modal };
+
+/**
+ * Static bridge helper to capture Ant Design's context-aware instances.
+ * This allows static utility functions to use the same theme/context as the rest of the app.
+ */
+function StaticApp() {
+    const {
+        message: msg,
+        notification: notify,
+        modal: mdl
+    } = App.useApp();
+
+    message = msg;
+    notification = notify;
+    modal = mdl;
+
+    return null;
+}
 
 export type Theme = 'light' | 'dark' | 'system';
 
@@ -54,8 +78,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const applyTheme = (newTheme: Theme) => {
         let isDarkMode = false;
 
+        const systemIsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         if (newTheme === 'system') {
-            isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            isDarkMode = systemIsDark;
         } else {
             isDarkMode = newTheme === 'dark';
         }
@@ -84,6 +109,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                         : undefined,
                 }}
             >
+                <div style={{ display: 'none' }}>
+                    <App>
+                        <StaticApp />
+                    </App>
+                </div>
                 {children}
             </ConfigProvider>
         </ThemeContext.Provider>

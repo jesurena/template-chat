@@ -13,7 +13,7 @@ import { useDrive } from '@/components/Providers/drive-provider';
 
 export default function ChatPage() {
     const [inputValue, setInputValue] = useState('');
-    const { messages, isTyping, sendMessage } = useChat();
+    const { messages, isTyping, sendMessage, stopTyping } = useChat();
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [mounted, setMounted] = useState(false);
 
@@ -81,7 +81,19 @@ export default function ChatPage() {
 
     const handleUseGeneratedQuestion = (prompt: string) => {
         setIsGeneratedQuestionsModalOpen(false);
-        handleSendMessage(prompt);
+        setInputValue(prompt);
+        setTimeout(() => {
+            const textarea = document.querySelector('textarea');
+            textarea?.focus();
+        }, 100);
+    };
+
+    const handleInsertQuestion = (prompt: string) => {
+        setInputValue(prompt);
+        setTimeout(() => {
+            const textarea = document.querySelector('textarea');
+            textarea?.focus();
+        }, 100);
     };
 
     const handleCloseGeneratedQuestions = () => {
@@ -106,7 +118,7 @@ export default function ChatPage() {
                             onGenerateQuestions={handleGenerateQuestions}
                             onSkip={handleSkip}
                             isConnectedToDrive={isConnectedToDrive}
-                            onSuggestionClick={handleSendMessage}
+                            onSuggestionClick={handleInsertQuestion}
                         />
                     ) : (
                         <ChatMessages messages={messages} isTyping={isTyping} />
@@ -119,9 +131,9 @@ export default function ChatPage() {
             <div className="w-full bg-chat-bg">
                 {/* Only show Quick Questions after intro and when not typing */}
                 {!isTyping && messages.length > 0 && (
-                    <div className="max-w-3xl mx-auto px-4">
+                    <div className="max-w-4xl mx-auto px-4">
                         <QuickQuestions
-                            onQuestionClick={handleSendMessage}
+                            onQuestionClick={handleInsertQuestion}
                             questions={customQuickQuestions}
                         />
                     </div>
@@ -139,6 +151,8 @@ export default function ChatPage() {
                     onGenerateQuestions={handleGenerateQuestions}
                     onSkip={handleSkip}
                     isConnectedToDrive={isConnectedToDrive}
+                    isTyping={isTyping}
+                    onStop={stopTyping}
                 />
             </div>
 
@@ -146,7 +160,7 @@ export default function ChatPage() {
             <div className="absolute bottom-8 right-8 md:bottom-8 md:right-8 z-40">
                 <button
                     onClick={() => setIsDriveModalOpen(true)}
-                    className={`w-[54px] h-[54px] rounded-full bg-white shadow-lg border flex items-center justify-center hover:scale-105 transition-all duration-300 ${!isConnectedToDrive ? "border-red-200 shadow-red-500/10" : "border-border"}`}
+                    className={`w-[54px] h-[54px] rounded-full bg-background shadow-lg border-border flex items-center justify-center hover:scale-105 transition-all duration-300 ${!isConnectedToDrive ? "border-red-200 shadow-red-500/10" : "border-border"}`}
                     title={isConnectedToDrive ? "Google Drive Connected" : "Connect Google Drive"}
                 >
                     <div className="relative flex items-center justify-center w-full h-full">

@@ -63,3 +63,93 @@ body {
 .chat-plus-popover .ant-popover-content {
   margin-bottom: 8px;
 }
+
+/* Chat Markdown Styling */
+.chat-markdown {
+  line-height: 1.7;
+  word-break: break-word;
+}
+
+.chat-markdown p {
+  margin: 0 1em 2.2em 0;
+}
+
+.chat-markdown p:last-child {
+  margin-bottom: 0;
+}
+
+.chat-markdown strong {
+  font-weight: 700;
+}
+
+.chat-markdown h1,
+.chat-markdown h2,
+.chat-markdown h3,
+.chat-markdown h4 {
+  font-weight: 700;
+  margin: 1em 0 0.4em 0;
+}
+
+.chat-markdown h1:first-child,
+.chat-markdown h2:first-child,
+.chat-markdown h3:first-child,
+.chat-markdown h4:first-child {
+  margin-top: 0;
+}
+
+.chat-markdown ol,
+.chat-markdown ul {
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+}
+
+.chat-markdown ol {
+  list-style-type: decimal;
+}
+
+.chat-markdown ul {
+  list-style-type: disc;
+}
+
+.chat-markdown li {
+  margin-bottom: 0.25em;
+}
+
+.chat-markdown li:last-child {
+  margin-bottom: 0;
+}
+
+.chat-markdown code {
+  background: rgba(0, 0, 0, 0.06);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.dark .chat-markdown code {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.chat-markdown pre {
+  background: rgba(0, 0, 0, 0.06);
+  padding: 0.8em 1em;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 0.6em 0;
+}
+
+.chat-markdown pre code {
+  background: none;
+  padding: 0;
+}
+
+.dark .chat-markdown pre {
+  background: rgba(255, 255, 0, 0.06);
+}
+
+.chat-markdown blockquote {
+  border-left: 3px solid var(--accent-1);
+  padding-left: 0.8em;
+  margin: 0.6em 0;
+  opacity: 0.85;
+}

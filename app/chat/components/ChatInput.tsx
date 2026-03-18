@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Plus, Mic, ArrowUp, X, Paperclip, Lightbulb, Telescope, ShoppingBag, MoreHorizontal, Building2, ChevronRight } from 'lucide-react';
+import { Plus, Mic, ArrowUp, X, Paperclip, Lightbulb, Telescope, ShoppingBag, MoreHorizontal, Building2, ChevronRight, ChevronUp, ChevronDown, Square } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { Company } from '@/interface/Chat';
@@ -25,6 +25,8 @@ interface ChatInputProps {
     onGenerateQuestions: () => void;
     onSkip: () => void;
     isConnectedToDrive: boolean;
+    isTyping?: boolean;
+    onStop?: () => void;
 }
 
 export function ChatInput({
@@ -38,10 +40,13 @@ export function ChatInput({
     setIsCompanyModalOpen,
     onGenerateQuestions,
     onSkip,
-    isConnectedToDrive
+    isConnectedToDrive,
+    isTyping = false,
+    onStop
 }: ChatInputProps) {
     const { theme } = useTheme();
     const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
     const [mounted, setMounted] = useState(false);
 
     React.useEffect(() => {
@@ -119,29 +124,41 @@ export function ChatInput({
     );
 
     return (
-        <div className="w-full bg-chat-bg transition-colors duration-300 pb-6 pt-2">
-            <div className="max-w-3xl mx-auto px-4 relative flex flex-col items-center">
+        <div className="w-full bg-chat-bg transition-all duration-500 pb-2 pt-2 border-t border-border/20 shadow-[0_-4px_12px_-4px_rgba(0,0,0,0.05)]">
+            <div className="max-w-4xl mx-auto px-4 relative flex flex-col items-center">
+                <div className={cn(
+                    "relative flex flex-col w-full bg-neutral border border-border rounded-[26px] p-2 focus-within:border-accent-1 focus-within:ring-1 focus-within:ring-accent-1/20 transition-all duration-500 ease-in-out shadow-sm",
+                    isExpanded ? "min-h-[300px] rounded-[24px]" : "min-h-[64px]"
+                )}>
+                    {/* Context and Expand Header */}
+                    <div className="flex items-center justify-between w-full px-2 mb-1">
+                        {selectedCompanies.length > 0 ? (
+                            <div className="flex flex-wrap gap-2 py-1 max-h-[90px] overflow-y-auto scrollbar-hide pr-2">
+                                {selectedCompanies.map(c => (
+                                    <div key={c.company_name} className="flex items-center gap-1.5 bg-accent-1 text-white px-3 py-1.5 rounded-full text-[12px] font-bold shadow-sm transition-all hover:bg-accent-1/90">
+                                        <span className="truncate max-w-[180px]">{c.company_name}</span>
+                                        <button
+                                            onClick={(e) => { e.preventDefault(); removeCompany(c.company_name); }}
+                                            className="hover:bg-white/20 p-0.5 rounded-full transition-colors flex shrink-0"
+                                            disabled={isTyping}
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : <div />}
 
-                <div className="relative flex flex-col w-full min-h-[52px] bg-neutral border border-border rounded-[26px] p-2 focus-within:border-accent-1 focus-within:ring-1 focus-within:ring-accent-1/20 transition-all shadow-sm">
-                    {/* Selected Companies Preview Area */}
-                    {selectedCompanies.length > 0 && (
-                        <div className="flex flex-wrap gap-2 px-3 pt-2 pb-1">
-                            {selectedCompanies.map(c => (
-                                <div key={c.company_name} className="flex items-center gap-1 bg-accent-1 text-white px-2.5 py-1 rounded-full text-[13px] font-medium shadow-sm transition-all">
-                                    <span className="truncate max-w-[150px]">{c.company_name}</span>
-                                    <button
-                                        onClick={(e) => { e.preventDefault(); removeCompany(c.company_name); }}
-                                        className="hover:bg-white/20 p-0.5 rounded-full transition-colors flex shrink-0"
-                                    >
-                                        <X size={12} />
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                        <button
+                            onClick={() => setIsExpanded(!isExpanded)}
+                            className="p-1.5 text-gray-400 hover:text-accent-1 hover:bg-neutral rounded-lg transition-all"
+                            title={isExpanded ? "Collapse" : "Expand"}
+                        >
+                            {isExpanded ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
+                        </button>
+                    </div>
 
-                    {/* Input Row */}
-                    <div className="flex items-end w-full">
+                    <div className="flex items-end w-full grow">
                         {mounted ? (
                             <Popover
                                 content={popoverContent}
@@ -156,12 +173,12 @@ export function ChatInput({
                                 <button
                                     className={cn(
                                         "p-2.5 rounded-full transition-colors mb-0.5 ml-0.5 shrink-0",
-                                        isConnectedToDrive
+                                        isConnectedToDrive && !isTyping
                                             ? "text-gray-500 hover:bg-gray-200"
                                             : "text-gray-300 cursor-not-allowed"
                                     )}
-                                    title={isConnectedToDrive ? "More options" : "Connect Google Drive to select clients"}
-                                    disabled={!isConnectedToDrive}
+                                    title={isTyping ? "Wait for response..." : isConnectedToDrive ? "More options" : "Connect Google Drive to select clients"}
+                                    disabled={!isConnectedToDrive || isTyping}
                                 >
                                     <Plus size={20} />
                                 </button>
@@ -180,14 +197,21 @@ export function ChatInput({
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyDown={(e) => {
-                                if (e.key === 'Enter' && !e.shiftKey) {
+                                if (e.key === 'Enter' && !e.shiftKey && !isTyping) {
                                     e.preventDefault();
+                                    if (isExpanded) setIsExpanded(false);
                                     onSendMessage(inputValue);
                                 }
                             }}
-                            placeholder="Ask about project standards..."
-                            className="flex-1 bg-transparent border-none focus:ring-0 text-[15px] text-foreground py-3 px-2 resize-none max-h-48 overflow-y-auto outline-none placeholder:text-gray-400"
+                            disabled={isTyping}
+                            placeholder={isTyping ? "AI is responding..." : "Ask about project standards..."}
+                            className={cn(
+                                "flex-1 bg-transparent border-none focus:ring-0 text-[15px] text-foreground py-3 px-3 resize-none overflow-y-auto outline-none placeholder:text-gray-400/60 transition-all duration-500",
+                                isExpanded ? "h-[400px]" : "min-h-[44px] max-h-[160px]",
+                                isTyping && "opacity-50"
+                            )}
                             onInput={(e) => {
+                                if (isExpanded) return;
                                 const target = e.target as HTMLTextAreaElement;
                                 target.style.height = 'auto';
                                 target.style.height = `${target.scrollHeight}px`;
@@ -199,27 +223,36 @@ export function ChatInput({
                                 <Mic size={20} />
                             </button>
                             <button
-                                onClick={() => onSendMessage(inputValue)}
+                                onClick={() => isTyping ? onStop?.() : onSendMessage(inputValue)}
                                 className={cn(
-                                    "w-10 h-10 rounded-full transition-all flex items-center justify-center shrink-0",
-                                    inputValue.trim()
-                                        ? "bg-accent-1 text-white hover:opacity-90 shadow-md"
-                                        : "bg-gray-900 text-white"
+                                    "w-10 h-10 rounded-full transition-all flex items-center justify-center shrink-0 shadow-md",
+                                    isTyping
+                                        ? "bg-red-500 text-white hover:bg-red-600"
+                                        : inputValue.trim()
+                                            ? "bg-accent-1 text-white hover:opacity-90"
+                                            : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
                                 )}
-                                disabled={!inputValue.trim()}
+                                disabled={!isTyping && !inputValue.trim()}
                             >
-                                {inputValue.trim() ? <ArrowUp size={20} /> : (
-                                    <div className="flex items-center gap-[2px]">
-                                        <div className="w-[3px] h-2 bg-white rounded-full animate-pulse" />
-                                        <div className="w-[3px] h-5 bg-white rounded-full animate-pulse delay-75" />
-                                        <div className="w-[3px] h-3 bg-white rounded-full animate-pulse delay-150" />
-                                        <div className="w-[2px] h-2 bg-white rounded-full animate-pulse delay-225" />
-                                    </div>
+                                {isTyping ? (
+                                    <Square size={16} fill="white" className="animate-pulse" />
+                                ) : (
+                                    inputValue.trim() ? <ArrowUp size={20} /> : (
+                                        <div className="flex items-center gap-[2px]">
+                                            <div className="w-[3px] h-2 bg-gray-400 rounded-full" />
+                                            <div className="w-[3px] h-5 bg-gray-400 rounded-full" />
+                                            <div className="w-[3px] h-3 bg-gray-400 rounded-full" />
+                                            <div className="w-[2px] h-2 bg-gray-400 rounded-full" />
+                                        </div>
+                                    )
                                 )}
                             </button>
                         </div>
                     </div>
                 </div>
+                <p className="my-2 mt-3 text-[11px] text-gray-400 font-medium text-center">
+                    AI can make mistakes. Check important info.
+                </p>
             </div>
 
             {mounted && (
