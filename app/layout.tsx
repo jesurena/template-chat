@@ -1,6 +1,7 @@
 import "./globals.css";
 import QueryProvider from "@/components/Providers/query-provider";
 import { ThemeProvider } from "@/components/Providers/theme-provider";
+import { DriveProvider } from "@/components/Providers/drive-provider";
 
 export default function RootLayout({
   children,
@@ -12,7 +13,9 @@ export default function RootLayout({
       <body className="antialiased">
         <ThemeProvider>
           <QueryProvider>
-            {children}
+            <DriveProvider>
+              {children}
+            </DriveProvider>
           </QueryProvider>
         </ThemeProvider>
       </body>

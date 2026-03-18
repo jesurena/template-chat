@@ -10,7 +10,9 @@ import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 import SettingsModal from './Settings/SettingsModal';
+import SearchChatsModal from './Sidebars/SearchChatsModal';
 import { useChat } from '@/hooks/chat/useChat';
+import { mockChats } from '@/app/chat/components/mockChats';
 const useAuth = () => ({
     user: {
         Nickname: 'Admin User',
@@ -32,7 +34,9 @@ export default function Sidebar() {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const { user, isLoading } = useAuth();
     const { mutate: logout } = useLogout();
-    const { resetChat } = useChat();
+    const { resetChat, loadChat } = useChat();
+
+    const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
     const userMenuItems: MenuProps['items'] = [
         {
@@ -68,7 +72,7 @@ export default function Sidebar() {
                         </div>
                         <span className="font-bold text-foreground">AppDev Chat</span>
                     </div>
-                    <span className="text-[11px] text-gray-500 mt-1 pl-7">
+                    <span className="text-xs text-gray-500 mt-1 pl-7">
                         AI-powered project assistance and code guidance.
                     </span>
                 </div>
@@ -84,7 +88,7 @@ export default function Sidebar() {
                         </div>
                         <span className="font-bold text-foreground">User Management</span>
                     </div>
-                    <span className="text-[11px] text-gray-500 mt-1 pl-7">
+                    <span className="text-xs text-gray-500 mt-1 pl-7">
                         Administer user roles, permissions, and accounts.
                     </span>
                 </div>
@@ -101,7 +105,7 @@ export default function Sidebar() {
                             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-sm">
                                 <span className="text-white font-bold text-xs">AC</span>
                             </div>
-                            <span className="text-[19px] font-bold text-foreground tracking-tight">
+                            <span className="text-lg font-bold text-foreground tracking-tight">
                                 AppDev Central
                             </span>
                             <ChevronDown size={14} className="text-gray-400 group-hover:text-gray-600 transition-colors" />
@@ -117,7 +121,10 @@ export default function Sidebar() {
                         <Plus size={18} />
                         <span>New chat</span>
                     </button>
-                    <button className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-neutral transition-colors">
+                    <button
+                        onClick={() => setIsSearchModalOpen(true)}
+                        className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-neutral transition-colors w-full"
+                    >
                         <Search size={18} />
                         <span>Search chats</span>
                     </button>
@@ -129,8 +136,20 @@ export default function Sidebar() {
                     <h3 className="text-xs font-bold text-gray-400 tracking-wider mb-2">
                         Your chats
                     </h3>
-                    <div className="flex flex-col gap-0.5 mt-4">
-                        <p className="px-3 text-xs text-gray-400 italic">No recent chats</p>
+                    <div className="flex flex-col gap-0.5 mt-2">
+                        {mockChats.slice(0, 4).map(chat => (
+                            <button
+                                key={chat.id}
+                                onClick={() => {
+                                    loadChat(chat.messages);
+                                    setIsOpen(false);
+                                }}
+                                className="flex items-center gap-2.5 px-3 py-2 text-sm text-text hover:bg-neutral rounded-lg transition-colors text-left w-full group"
+                            >
+                                <MessageSquare size={14} className="shrink-0 text-gray-400 group-hover:text-accent-1 transition-colors" />
+                                <span className="truncate flex-1 font-medium">{chat.title}</span>
+                            </button>
+                        ))}
                     </div>
                 </div>
             </div>
@@ -153,10 +172,10 @@ export default function Sidebar() {
                                 </Avatar>
                             )}
                             <div className="flex flex-col text-left overflow-hidden">
-                                <span className="text-[14px] font-semibold text-foreground leading-none mb-1 truncate">
+                                <span className="text-sm font-semibold text-foreground leading-none mb-1 truncate">
                                     {isLoading ? 'Loading...' : (user?.Nickname || user?.AccountName || 'Guest User')}
                                 </span>
-                                <span className="text-[12px] text-gray-500 truncate">
+                                <span className="text-xs text-gray-500 truncate">
                                     {isLoading ? 'Please wait' : (user?.Email || 'Not logged in')}
                                 </span>
                             </div>
@@ -212,6 +231,16 @@ export default function Sidebar() {
             <SettingsModal
                 visible={isSettingsOpen}
                 onClose={() => setIsSettingsOpen(false)}
+            />
+
+            <SearchChatsModal
+                open={isSearchModalOpen}
+                onClose={() => setIsSearchModalOpen(false)}
+                onSelectChat={(messages) => {
+                    loadChat(messages);
+                    setIsSearchModalOpen(false);
+                    setIsOpen(false);
+                }}
             />
         </>
     );

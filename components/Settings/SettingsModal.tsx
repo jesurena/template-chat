@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { Modal, Select } from 'antd';
-import { useTheme, type Theme } from '@/components/Providers/theme-provider';
-import { Settings, Sun, Moon, Monitor, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { Button, Modal, Select } from 'antd';
+import { useTheme } from '@/components/Providers/theme-provider';
+import { Settings, Sun, Moon, Monitor, X, Link as LinkIcon, CheckCircle2 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { useDrive } from '@/components/Providers/drive-provider';
 
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -48,6 +49,8 @@ const themeOptions = [
 
 export default function SettingsModal({ visible, onClose }: SettingsModalProps) {
     const { theme, setTheme } = useTheme();
+    const [activeTab, setActiveTab] = useState<'general' | 'connections'>('general');
+    const { isConnectedToDrive, setIsConnectedToDrive, setIsDriveModalOpen } = useDrive();
 
     return (
         <Modal
@@ -56,12 +59,12 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
             footer={null}
             closeIcon={null}
             width={{
-                xs: '90%',
-                sm: '80%',
-                md: '70%',
+                xs: '80%',
+                sm: '70%',
+                md: '65%',
                 lg: '60%',
-                xl: '50%',
-                xxl: '40%',
+                xl: '55%',
+                xxl: '50%',
             }}
             mask={false}
             centered
@@ -80,38 +83,104 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
 
                     <nav className="flex flex-col gap-1 px-3 flex-1">
                         <button
-                            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer bg-accent-1 text-white shadow-sm"
+                            onClick={() => setActiveTab('general')}
+                            className={cn(
+                                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer",
+                                activeTab === 'general'
+                                    ? "bg-accent-1 text-white shadow-sm"
+                                    : "text-foreground hover:bg-black/5 dark:hover:bg-white/5"
+                            )}
                         >
                             <Settings size={18} />
                             <span>General</span>
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('connections')}
+                            className={cn(
+                                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer",
+                                activeTab === 'connections'
+                                    ? "bg-accent-1 text-white shadow-sm"
+                                    : "text-foreground hover:bg-black/5 dark:hover:bg-white/5"
+                            )}
+                        >
+                            <LinkIcon size={18} />
+                            <span>Connections</span>
                         </button>
                     </nav>
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-8">
-                    <div className="flex flex-col gap-6">
-                        <div>
-                            <h3 className="text-lg font-semibold text-foreground">General</h3>
-                            <p className="text-sm text-foreground/50 mt-1">
-                                Manage your general preferences.
-                            </p>
-                        </div>
+                    {activeTab === 'general' && (
+                        <div className="flex flex-col gap-6 animate-in fade-in duration-300">
+                            <div>
+                                <h3 className="text-lg font-semibold text-foreground">General</h3>
+                                <p className="text-sm text-foreground/50 mt-1">
+                                    Manage your general preferences.
+                                </p>
+                            </div>
 
-                        <div>
-                            <label className="text-sm font-medium text-foreground block mb-2">
-                                Theme Appearance
-                            </label>
-                            <Select
-                                value={theme}
-                                onChange={(val) => setTheme(val)}
-                                options={themeOptions}
-                                className="w-full sm:w-64"
-                            />
-                            <p className="text-xs text-foreground/50 mt-2">
-                                Select how you'd like the UI to appear on your screen.
-                            </p>
+                            <div>
+                                <label className="text-sm font-medium text-foreground block mb-2">
+                                    Theme Appearance
+                                </label>
+                                <Select
+                                    value={theme}
+                                    onChange={(val) => setTheme(val)}
+                                    options={themeOptions}
+                                    className="w-full sm:w-64"
+                                />
+                                <p className="text-xs text-foreground/50 mt-2">
+                                    Select how you'd like the UI to appear on your screen.
+                                </p>
+                            </div>
                         </div>
-                    </div>
+                    )}
+
+                    {activeTab === 'connections' && (
+                        <div className="flex flex-col gap-6 animate-in fade-in duration-300">
+                            <div>
+                                <h3 className="text-lg font-semibold text-foreground">Connections</h3>
+                                <p className="text-sm text-foreground/50 mt-1">
+                                    Manage third-party integrations and data sources.
+                                </p>
+                            </div>
+
+                            <div className="flex items-center justify-between p-4 rounded-xl border border-border bg-neutral/50">
+                                <div className="flex items-center gap-4">
+                                    <img
+                                        src="/gdrive.svg"
+                                        alt="Google Drive"
+                                        className={cn("w-10 h-10 transition-all", !isConnectedToDrive && "grayscale opacity-50")}
+                                    />
+                                    <div className="flex flex-col">
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-semibold text-foreground">Google Drive</span>
+                                            {isConnectedToDrive && (
+                                                <span className="flex items-center gap-1 text-xs font-bold text-green-600">
+                                                    <CheckCircle2 size={11} />
+                                                    Connected
+                                                </span>
+                                            )}
+                                        </div>
+                                        <span className="text-sm text-gray-500">
+                                            Sync documents and client context
+                                        </span>
+                                    </div>
+                                </div>
+                                <Button
+                                    onClick={() => {
+                                        if (isConnectedToDrive) {
+                                            setIsConnectedToDrive(false);
+                                        } else {
+                                            setIsConnectedToDrive(true);
+                                        }
+                                    }}
+                                >
+                                    {isConnectedToDrive ? "Disconnect" : "Connect"}
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </Modal>

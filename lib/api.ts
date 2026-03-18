@@ -2,7 +2,7 @@ import axios from 'axios';
 import { notification } from 'antd';
 
 const api = axios.create({
-    baseURL: process.env.LARAVEL_API_URL || 'http://localhost:8000/api',
+    baseURL: process.env.NEXT_PUBLIC_API_URL,
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
@@ -18,7 +18,7 @@ api.interceptors.response.use(
 
         if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method || '') && hasMessage) {
             notification.success({
-                message: 'Success',
+                title: 'Success',
                 description: response.data.message,
                 placement: 'topRight',
             });
@@ -38,7 +38,7 @@ api.interceptors.response.use(
             }
         } else {
             notification.error({
-                message: 'Error',
+                title: 'Error',
                 description: message,
                 placement: 'topRight',
             });

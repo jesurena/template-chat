@@ -4,6 +4,7 @@ import React from 'react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { CheckOutlined, RobotOutlined } from '@ant-design/icons';
+import { Loader2 } from 'lucide-react';
 import { Avatar } from 'antd';
 import { ChatMessage } from '@/interface/Chat';
 
@@ -17,6 +18,12 @@ interface ChatMessagesProps {
 }
 
 export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
+    const [mounted, setMounted] = React.useState(false);
+
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
+
     return (
         <div className="py-10 space-y-10 px-4 md:px-0">
             {messages.map((msg, i) => (
@@ -42,19 +49,25 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
                     {msg.IsUser ? (
                         <div className="flex items-center gap-1.5 px-1 mt-1">
                             <span className="text-[12px] text-gray-400 font-medium">
-                                {new Date(msg.Timestamp).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                                {mounted && new Date(msg.Timestamp).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
                             </span>
                             <div className="flex items-center -space-x-1.5">
-                                <CheckOutlined className="text-[11px] text-accent-1 font-bold" />
-                                {msg.Status === 'delivered' && (
-                                    <CheckOutlined className="text-[11px] text-accent-1 font-bold" />
+                                {msg.Status === 'sending' ? (
+                                    <Loader2 className="text-[11px] text-accent-1 animate-spin" />
+                                ) : (
+                                    <>
+                                        <CheckOutlined className="text-[11px] text-accent-1 font-bold" />
+                                        {msg.Status === 'delivered' && (
+                                            <CheckOutlined className="text-[11px] text-accent-1 font-bold" />
+                                        )}
+                                    </>
                                 )}
                             </div>
                         </div>
                     ) : (
                         <div className="flex items-center gap-1.5 px-1 mt-1 ml-10">
                             <span className="text-[12px] text-gray-400 font-medium">
-                                {new Date(msg.Timestamp).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                                {mounted && new Date(msg.Timestamp).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
                             </span>
                         </div>
                     )}

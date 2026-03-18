@@ -10,17 +10,32 @@ function cn(...inputs: ClassValue[]) {
 }
 
 
-export function QuickQuestions({ onQuestionClick }: { onQuestionClick: (prompt: string) => void }) {
+import { Tooltip } from 'antd';
+
+export interface QuickQuestion {
+    label: string;
+    prompt: string;
+}
+
+const defaultQuestions: QuickQuestion[] = [
+    { label: 'Theme Colors', prompt: 'What is the color palette for AppDev Central?' },
+    { label: 'Naming Rules', prompt: 'What are the naming conventions for components and hooks?' },
+    { label: 'Directory Rules', prompt: 'Explain the directory structure for this project' },
+    { label: 'Ant Design', prompt: 'How do we use Ant Design components here?' },
+    { label: 'TanStack Query', prompt: 'What is the standard for data fetching?' },
+    { label: 'StatusChip', prompt: 'How do I implement the StatusChip component?' }
+];
+
+export function QuickQuestions({
+    onQuestionClick,
+    questions
+}: {
+    onQuestionClick: (prompt: string) => void,
+    questions: QuickQuestion[]
+}) {
     const [show, setShow] = useState(true);
 
-    const quickQuestions = [
-        { label: 'Theme Colors', prompt: 'What is the color palette for AppDev Central?' },
-        { label: 'Naming Rules', prompt: 'What are the naming conventions for components and hooks?' },
-        { label: 'Directory Rules', prompt: 'Explain the directory structure for this project' },
-        { label: 'Ant Design', prompt: 'How do we use Ant Design components here?' },
-        { label: 'TanStack Query', prompt: 'What is the standard for data fetching?' },
-        { label: 'StatusChip', prompt: 'How do I implement the StatusChip component?' }
-    ];
+    if (!questions || questions.length === 0) return null;
 
     return (
         <div className="w-full px-6 mb-4 flex flex-col items-center">
@@ -39,14 +54,15 @@ export function QuickQuestions({ onQuestionClick }: { onQuestionClick: (prompt: 
                 "overflow-hidden transition-all duration-300 ease-out flex flex-wrap justify-center gap-2",
                 show ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
             )}>
-                {quickQuestions.map((q) => (
-                    <button
-                        key={q.label}
-                        onClick={() => onQuestionClick(q.prompt)}
-                        className="py-1.5 px-3 text-[11px] rounded-full font-semibold bg-neutral text-foreground hover:bg-neutral/80 transition-all active:scale-95 border border-border"
-                    >
-                        {q.label}
-                    </button>
+                {questions.map((q, idx) => (
+                    <Tooltip key={`${q.label}-${idx}`} title={q.prompt} placement="top">
+                        <button
+                            onClick={() => onQuestionClick(q.prompt)}
+                            className="py-1.5 px-3 text-[11px] rounded-full font-semibold bg-neutral text-foreground hover:bg-neutral/80 transition-all active:scale-95 border border-border"
+                        >
+                            {q.label}
+                        </button>
+                    </Tooltip>
                 ))}
             </div>
         </div>

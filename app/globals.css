@@ -7,7 +7,7 @@
   --accent-1: #1677ff;
   --accent-2: #FF8A3D;
   --neutral: #F8FAFC;
-  --border: #f1f5f9;
+  --border: #d9dadb;
   --sidebar-bg: #FFFFFF;
   --chat-bg: #eaeaea;
 }
@@ -45,4 +45,21 @@ body {
 
 .ant-modal-mask {
   backdrop-filter: blur(4px) !important;
+}
+
+/* Chat Plus Popover Styling */
+.chat-plus-popover .ant-popover-inner {
+  padding: 4px !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.dark .chat-plus-popover .ant-popover-inner {
+  border: 1px solid #27272a;
+  background-color: #18181b !important;
+}
+
+.chat-plus-popover .ant-popover-content {
+  margin-bottom: 8px;
 }
