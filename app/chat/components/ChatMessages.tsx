@@ -90,9 +90,15 @@ export function ChatMessages({ messages, isTyping, streamingText }: ChatMessages
                         </span>
                         {isUser(msg.role) && (
                             <div className="flex items-center -space-x-1.5">
-                                <CheckOutlined className="text-[11px] text-accent-1 font-bold" />
-                                {msg.Status === 'delivered' && (
-                                    <CheckOutlined className="text-[11px] text-accent-1 font-bold" />
+                                {msg.Status === 'sending' ? (
+                                    <Loader2 className="w-3 h-3 text-accent-1 animate-spin" />
+                                ) : (
+                                    <>
+                                        <CheckOutlined className="text-[11px] text-accent-1 font-bold" />
+                                        {msg.Status === 'delivered' && (
+                                            <CheckOutlined className="text-[11px] text-accent-1 font-bold" />
+                                        )}
+                                    </>
                                 )}
                             </div>
                         )}

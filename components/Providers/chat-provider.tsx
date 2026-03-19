@@ -26,7 +26,16 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     const streamMutation = useStreamMessage(
         (chunk) => setStreamingText(chunk),
         (completeText) => {
-            setMessages(prev => [...prev, createMessage(completeText, 'assistant')]);
+            setMessages(prev => {
+                const updated = [...prev];
+                for (let i = updated.length - 1; i >= 0; i--) {
+                    if (updated[i].role === 'user') {
+                        updated[i].Status = 'delivered';
+                        break;
+                    }
+                }
+                return [...updated, createMessage(completeText, 'assistant')];
+            });
             setIsTyping(false);
             setStreamingText("");
         },
