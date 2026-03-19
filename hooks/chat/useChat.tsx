@@ -2,26 +2,40 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
-import { ChatThread, ChatMessage } from '@/interface/Chat';
+import { ChatThread, ChatMessage, Company } from '@/interface/Chat';
 import { streamChatResponse } from '@/utils/chat';
 
 export { useChat } from '@/components/Providers/chat-provider';
 
-/**
- * API Endpoints (Easier to adjust and debug here)
- */
-const GET_CHAT_HISTORY_URL = '/chat_list';
-const POST_STREAM_CHAT_URL = 'chat_stream';
-
 export const useChatHistory = (accountId: string | null) => {
-    return useQuery<ChatThread[]>({
+    return useQuery<any[]>({
         queryKey: ['chat-history', accountId],
         queryFn: async () => {
             if (!accountId) return [];
-            const { data } = await api.get(`${GET_CHAT_HISTORY_URL}?accountId=${accountId}`);
-            return data.chats || [];
+            const { data } = await api.get(`/chat_list?accountId=${accountId}`);
+            return data?.chats || [];
         },
         enabled: !!accountId,
+    });
+};
+
+export const useLoadChatHistory = () => {
+    return useMutation({
+        mutationFn: async (chatId: string) => {
+            const accountId = localStorage.getItem("AoId");
+            const { data } = await api.get(`/chat_history/${chatId}?accountId=${accountId}`);
+
+            const messages = (data.messages || []).map((m: any) => ({
+                role: m.role || 'assistant',
+                content: m.content || m.message || '',
+            }));
+
+            return {
+                messages,
+                sessionId: data.session_id,
+                chatId: chatId
+            };
+        }
     });
 };
 
@@ -32,22 +46,63 @@ export const useStreamMessage = (
 ) => {
     const queryClient = useQueryClient();
 
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL?.endsWith('/') 
-        ? process.env.NEXT_PUBLIC_API_URL 
-        : `${process.env.NEXT_PUBLIC_API_URL}/`;
-    
-    const streamUrl = `${baseUrl}${POST_STREAM_CHAT_URL}`;
+    const streamUrl = `${process.env.NEXT_PUBLIC_API_URL}chat_stream`;
 
     return useMutation({
-        mutationFn: async ({ prompt, history, controller }: { prompt: string, history: ChatMessage[], controller: AbortController }) => {
-            return await streamChatResponse(streamUrl, prompt, history, controller, onChunk);
+        mutationFn: async ({ prompt, history, controller, chatId, sessionId, companyName }: {
+            prompt: string,
+            history: ChatMessage[],
+            controller: AbortController,
+            chatId: string,
+            sessionId: string,
+            companyName: string | null
+        }) => {
+            return await streamChatResponse(
+                streamUrl,
+                prompt,
+                history,
+                controller,
+                onChunk,
+                chatId,
+                sessionId,
+                companyName
+            );
         },
         onSuccess: (data) => {
             onComplete(data);
-            queryClient.invalidateQueries({ queryKey: ['chat-history'] });
         },
         onError: (error) => {
             onError(error);
+        }
+    });
+};
+
+export const useGenerateKeywords = () => {
+    return useMutation({
+        mutationFn: async (companiesPayload: any[]) => {
+            const { data } = await api.post('/generate_keywords_from_company', {
+                companies: companiesPayload
+            });
+            return data.data || [];
+        }
+    });
+};
+
+export const useGenerateQuestions = () => {
+    return useMutation({
+        mutationFn: async ({ keywords }: { keywords: string[] }) => {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}generate_questions_from_keywords`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ keywords }),
+            });
+            
+            if (!res.ok) {
+                throw new Error('Failed to generate questions');
+            }
+            
+            const data = await res.json();
+            return data.data || [];
         }
     });
 };

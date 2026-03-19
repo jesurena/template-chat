@@ -9,19 +9,47 @@ interface ChatContextType {
     messages: ChatMessage[];
     isTyping: boolean;
     streamingText: string;
-    sendMessage: (prompt: string) => Promise<void>;
+    chatId: string;
+    sessionId: string;
+    sendMessage: (prompt: string, companyName?: string | null) => Promise<void>;
     stopTyping: () => void;
     resetChat: () => void;
-    loadChat: (msgs: ChatMessage[]) => void;
+    loadChat: (msgs: ChatMessage[], newChatId?: string, newSessionId?: string) => void;
 }
 
 export const ChatContext = createContext<ChatContextType | undefined>(undefined);
+
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
 
 export function ChatProvider({ children }: { children: ReactNode }) {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [isTyping, setIsTyping] = useState(false);
     const [streamingText, setStreamingText] = useState("");
     const abortControllerRef = useRef<AbortController | null>(null);
+
+    const [chatId, setChatId] = useState(() => {
+        if (typeof window === 'undefined') return '';
+        const saved = localStorage.getItem("chat_id");
+        if (saved) return saved;
+        const id = generateUUID();
+        localStorage.setItem("chat_id", id);
+        return id;
+    });
+
+    const [sessionId, setSessionId] = useState(() => {
+        if (typeof window === 'undefined') return '';
+        const saved = localStorage.getItem("session_id");
+        if (saved) return saved;
+        const id = generateUUID();
+        localStorage.setItem("session_id", id);
+        return id;
+    });
 
     const streamMutation = useStreamMessage(
         (chunk) => setStreamingText(chunk),
@@ -47,16 +75,16 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         }
     );
 
-    const stopTyping = () => {
+    const stopTyping = React.useCallback(() => {
         if (abortControllerRef.current) {
             abortControllerRef.current.abort();
             abortControllerRef.current = null;
         }
         setIsTyping(false);
         setStreamingText("");
-    };
+    }, []);
 
-    const sendMessage = async (prompt: string) => {
+    const sendMessage = React.useCallback(async (prompt: string, companyName: string | null = null) => {
         if (!prompt.trim() || isTyping) return;
 
         stopTyping();
@@ -72,23 +100,46 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         streamMutation.mutate({
             prompt,
             history: updatedMessages,
-            controller
+            controller,
+            chatId,
+            sessionId,
+            companyName
         });
-    };
+    }, [messages, isTyping, stopTyping, streamMutation, chatId, sessionId]);
+
+    const resetChat = React.useCallback(() => {
+        setMessages([]);
+        setStreamingText("");
+        setIsTyping(false);
+        
+        const newChat = generateUUID();
+        setChatId(newChat);
+        localStorage.setItem("chat_id", newChat);
+    }, []);
+
+    const loadChat = React.useCallback((msgs: ChatMessage[], newChatId?: string, newSessionId?: string) => {
+        setMessages(msgs);
+        if (newChatId) {
+            setChatId(newChatId);
+            localStorage.setItem("chat_id", newChatId);
+        }
+        if (newSessionId) {
+            setSessionId(newSessionId);
+            localStorage.setItem("session_id", newSessionId);
+        }
+    }, []);
 
     return (
         <ChatContext.Provider value={{
             messages,
             isTyping,
             streamingText,
+            chatId,
+            sessionId,
             sendMessage,
             stopTyping,
-            resetChat: () => {
-                setMessages([]);
-                setStreamingText("");
-                setIsTyping(false);
-            },
-            loadChat: (msgs: ChatMessage[]) => setMessages(msgs)
+            resetChat,
+            loadChat
         }}>
             {children}
         </ChatContext.Provider>

@@ -20,6 +20,7 @@ interface ChatIntroProps {
     isDriveConnected: boolean;
     onSuggestionClick: (prompt: string) => void;
     driveFiles?: any[];
+    companies: Company[];
 }
 
 export function ChatIntro({
@@ -30,9 +31,11 @@ export function ChatIntro({
     onSkip,
     isDriveConnected,
     onSuggestionClick,
-    driveFiles = []
+    driveFiles = [],
+    companies = []
 }: ChatIntroProps) {
-    const initialCompanies = mockCompanies.slice(0, 3);
+    const dataSource = companies.length > 0 ? companies : mockCompanies;
+    const initialCompanies = dataSource.slice(0, 3);
 
     if (!isDriveConnected) {
         const suggestions = [
@@ -155,7 +158,7 @@ export function ChatIntro({
                 onClick={onMoreClick}
                 className="text-accent-1 hover:text-accent-1/80 font-semibold mb-8 flex items-center gap-1 hover:gap-2 transition-all px-4 py-2"
             >
-                View {mockCompanies.length > 3 ? `${mockCompanies.length - 3} more` : 'all'} companies <ArrowRight size={16} />
+                View {dataSource.length > 3 ? `${dataSource.length - 3} more` : 'all'} companies <ArrowRight size={16} />
             </button>
 
             {/* Action buttons appear if anything is selected */}

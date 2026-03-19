@@ -32,6 +32,8 @@ export interface Company {
     gaps_or_limitations?: string;
     ics_deployments?: string;
     industry?: string;
+    file_name?: string;
+    file_text?: string;
     it_budget?: string;
     key_objectives?: string;
     potentials_solutions?: string;

@@ -11,7 +11,7 @@ import { twMerge } from 'tailwind-merge';
 
 import SettingsModal from '../Settings/SettingsModal';
 import SearchChatsModal from './SearchChatsModal';
-import { useChat, useChatHistory } from '@/hooks/chat/useChat';
+import { useChat, useChatHistory, useLoadChatHistory } from '@/hooks/chat/useChat';
 import { useGoogle } from '@/hooks/auth/useGoogle';
 import { User } from '@/interface/User';
 
@@ -52,6 +52,7 @@ export default function Sidebar() {
     const [isClientReady, setIsClientReady] = useState(false);
     const accountId = typeof window !== 'undefined' ? localStorage.getItem("AoId") : null;
     const { data: chatHistory = [], isLoading: isChatsLoading } = useChatHistory(accountId);
+    const loadChatMutation = useLoadChatHistory();
 
     React.useEffect(() => {
         setIsClientReady(true);
@@ -173,23 +174,34 @@ export default function Sidebar() {
                                 <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
                             </div>
                         ) : isClientReady && chatHistory.length > 0 ? (
-                            chatHistory.slice(0, 4).map((chat, idx) => (
+                            chatHistory.map((chat, idx) => (
                                 <button
-                                    key={chat.id || chat.session_id || idx}
-                                    onClick={() => {
-                                        // The backend might return standard mockChat signature or custom
-                                        if (chat.messages) {
-                                            loadChat(chat.messages);
+                                    key={chat.chat_id || idx}
+                                    disabled={loadChatMutation.isPending}
+                                    onClick={async () => {
+                                        try {
+                                            const chat_id = chat.chat_id || chat.id || chat.ThreadID;
+                                            if (!chat_id) {
+                                                console.error("No chat ID found for", chat);
+                                                return;
+                                            }
+                                            const data = await loadChatMutation.mutateAsync(chat_id);
+                                            loadChat(data.messages, data.chatId, data.sessionId);
+                                            
+                                            router.push(`/chat/${chat_id}`);
+                                            setIsOpen(false);
+                                        } catch (error) {
+                                            console.error("Failed to load past chat", error);
                                         }
-                                        if (pathname !== '/chat') {
-                                            router.push('/chat');
-                                        }
-                                        setIsOpen(false);
                                     }}
                                     className="flex items-center gap-2.5 px-3 py-2 text-sm text-text hover:bg-neutral rounded-lg transition-colors text-left w-full group"
                                 >
-                                    <MessageSquare size={14} className="shrink-0 text-gray-400 group-hover:text-accent-1 transition-colors" />
-                                    <span className="truncate flex-1 font-medium">{chat.title || chat.session_name || 'Chat ' + (idx + 1)}</span>
+                                    {loadChatMutation.isPending && loadChatMutation.variables === chat.chat_id ? (
+                                        <Loader2 size={14} className="shrink-0 text-gray-400 animate-spin" />
+                                    ) : (
+                                        <MessageSquare size={14} className="shrink-0 text-gray-400 group-hover:text-accent-1 transition-colors" />
+                                    )}
+                                    <span className="truncate flex-1 font-medium">{chat.content || 'Chat ' + (idx + 1)}</span>
                                 </button>
                             ))
                         ) : isClientReady ? (
@@ -274,13 +286,22 @@ export default function Sidebar() {
             <SearchChatsModal
                 open={isSearchModalOpen}
                 onClose={() => setIsSearchModalOpen(false)}
-                onSelectChat={(messages) => {
-                    loadChat(messages);
-                    if (pathname !== '/chat') {
-                        router.push('/chat');
+                onSelectChat={async (chat: any) => {
+                    try {
+                        const chat_id = chat.chat_id || chat.id || chat.ThreadID;
+                        if (!chat_id) {
+                            console.error("No chat ID found for", chat);
+                            return;
+                        }
+                        const data = await loadChatMutation.mutateAsync(chat_id);
+                        loadChat(data.messages, data.chatId, data.sessionId);
+                        
+                        router.push(`/chat/${chat_id}`);
+                        setIsSearchModalOpen(false);
+                        setIsOpen(false);
+                    } catch (error) {
+                        console.error("Failed to load past chat", error);
                     }
-                    setIsSearchModalOpen(false);
-                    setIsOpen(false);
                 }}
             />
         </>

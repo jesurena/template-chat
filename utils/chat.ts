@@ -20,7 +20,10 @@ export const streamChatResponse = async (
     prompt: string, 
     history: ChatMessage[], 
     controller: AbortController,
-    onChunk: (text: string) => void
+    onChunk: (text: string) => void,
+    chatId: string,
+    sessionId: string,
+    companyName: string | null
 ) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('jwt_token') : null;
 
@@ -32,6 +35,9 @@ export const streamChatResponse = async (
         },
         body: JSON.stringify({ 
             prompt,
+            chat_id: chatId,
+            session_id: sessionId,
+            company_name: companyName,
             chat_history: history
         }),
         credentials: 'include',
@@ -54,8 +60,28 @@ export const streamChatResponse = async (
 
         const chunk = decoder.decode(value, { stream: true });
         accumulatedText += chunk;
-        onChunk(accumulatedText);
+        
+        const marker = "\n\n[[LLM_METRICS]]";
+        let cleanText = accumulatedText;
+        if (accumulatedText.includes(marker)) {
+            const [text] = accumulatedText.split(marker);
+            cleanText = text;
+        }
+
+        onChunk(cleanText);
     }
     
-    return accumulatedText;
+    let finalText = accumulatedText;
+    const marker = "\n\n[[LLM_METRICS]]";
+    if (finalText.includes(marker)) {
+        const [text, metricsPart] = finalText.split(marker);
+        finalText = text;
+        try {
+            const metrics = JSON.parse(metricsPart);
+            // Example of where you might store/use metrics
+            // console.log("Received LLM Metrics:", metrics);
+        } catch(e) {}
+    }
+    
+    return finalText;
 };

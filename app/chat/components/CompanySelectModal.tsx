@@ -19,6 +19,7 @@ interface CompanySelectModalProps {
     toggleCompanySelect: (company: Company) => void;
     onSkip: () => void;
     onGenerateQuestions: () => void;
+    companies: Company[];
 }
 
 export function CompanySelectModal({
@@ -27,11 +28,14 @@ export function CompanySelectModal({
     selectedCompanies,
     toggleCompanySelect,
     onSkip,
-    onGenerateQuestions
+    onGenerateQuestions,
+    companies = []
 }: CompanySelectModalProps) {
     const [searchTerm, setSearchTerm] = useState('');
 
-    const filteredCompanies = mockCompanies.filter(c =>
+    const dataSource = companies.length > 0 ? companies : mockCompanies;
+    
+    const filteredCompanies = dataSource.filter(c =>
         c.company_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 

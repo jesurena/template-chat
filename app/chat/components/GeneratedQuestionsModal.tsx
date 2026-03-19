@@ -6,6 +6,7 @@ import { Sparkles, ArrowRight, Check, Hash, Loader2, Target, Send } from 'lucide
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { Company } from '@/interface/Chat';
+import { useGenerateQuestions } from '@/hooks/chat/useChat';
 
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -23,6 +24,8 @@ interface GeneratedQuestionsModalProps {
     onClose: () => void;
     onUseQuestion: (prompt: string) => void;
     selectedCompanies: Company[];
+    keywords?: any; // The new structure { "0": { company_name, keywords } }
+    isLoadingKeywords?: boolean;
 }
 
 const categoryColors: Record<string, string> = {
@@ -33,20 +36,15 @@ const categoryColors: Record<string, string> = {
     'Regulatory': 'purple',
 };
 
-// Extracted keywords array for step 1
-export const AVAILABLE_KEYWORDS = [
+// Default keywords if API fails
+export const DEFAULT_KEYWORDS = [
     'Risk Analysis',
     'Implementation',
     'Standardization',
     'Infrastructure',
     'Regulatory',
     'Market Trends',
-    'SLA Compliance',
-    'Operational Margins',
-    'Automation',
-    'Cross-border Logistics',
-    'Cost Optimization',
-    'Deployment Timeline'
+    'SLA Compliance'
 ];
 
 export const getGeneratedQuestions = (companies: Company[], keywords: string[] = []): GeneratedQuestion[] => {
@@ -148,13 +146,24 @@ export const getGeneratedQuestions = (companies: Company[], keywords: string[] =
     return allQuestions;
 };
 
-export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, selectedCompanies }: GeneratedQuestionsModalProps) {
+export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, selectedCompanies, keywords, isLoadingKeywords }: GeneratedQuestionsModalProps) {
     const [currentStep, setCurrentStep] = useState(0);
     const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [isGenerating, setIsGenerating] = useState(false);
 
     const [generatedQuestions, setGeneratedQuestions] = useState<GeneratedQuestion[]>([]);
+
+    const normalizedKeywords = React.useMemo(() => {
+        if (!keywords) return DEFAULT_KEYWORDS;
+        const all: string[] = [];
+        Object.values(keywords).forEach((entry: any) => {
+            if (entry.keywords && Array.isArray(entry.keywords)) {
+                all.push(...entry.keywords);
+            }
+        });
+        return all.length > 0 ? Array.from(new Set(all)) : DEFAULT_KEYWORDS;
+    }, [keywords]);
 
     useEffect(() => {
         if (isOpen) {
@@ -172,14 +181,47 @@ export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, select
         );
     };
 
-    const handleGenerate = () => {
+    const generateQuestionsMutation = useGenerateQuestions();
+
+    const handleGenerate = async () => {
+        if (selectedKeywords.length === 0) return;
+
         setIsGenerating(true);
-        setTimeout(() => {
-            const qs = getGeneratedQuestions(selectedCompanies, selectedKeywords);
-            setGeneratedQuestions(qs);
-            setIsGenerating(false);
+        try {
+            const result = await generateQuestionsMutation.mutateAsync({
+                keywords: selectedKeywords
+            });
+
+            // Map API response to GeneratedQuestion[]
+            // API result is an array of companies, each with a 'questions' object grouped by keyword
+            const flattenedQuestions: GeneratedQuestion[] = [];
+
+            if (Array.isArray(result)) {
+                result.forEach((compData: any) => {
+                    if (compData.questions) {
+                        Object.entries(compData.questions).forEach(([keyword, qList]: [string, any]) => {
+                            if (Array.isArray(qList)) {
+                                qList.forEach((q: any, idx: number) => {
+                                    flattenedQuestions.push({
+                                        id: `${compData.company_name}-${keyword}-${idx}`,
+                                        category: q.tag || 'Standardization',
+                                        targetCompany: compData.company_name,
+                                        question: q.text
+                                    });
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+
+            setGeneratedQuestions(flattenedQuestions);
             setCurrentStep(1);
-        }, 800);
+        } catch (error) {
+            console.error("Failed to generate questions:", error);
+        } finally {
+            setIsGenerating(false);
+        }
     };
 
     const handleInsert = () => {
@@ -227,12 +269,19 @@ export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, select
                 <div className="flex items-center justify-between p-4 bg-neutral/30 rounded-b-2xl">
                     {currentStep === 0 ? (
                         <>
-                            <p className="text-xs text-gray-500 font-medium max-w-[50%] text-left">
-                                {selectedKeywords.length === 0
-                                    ? "Select at least one keyword to help AI frame the questions."
-                                    : `${selectedKeywords.length} focus area${selectedKeywords.length > 1 ? 's' : ''} selected.`
-                                }
-                            </p>
+                            <div className="flex flex-col text-left">
+                                <p className="text-xs text-gray-500 font-medium">
+                                    {selectedKeywords.length === 0
+                                        ? "Select keywords to frame questions."
+                                        : `${selectedKeywords.length} focus area${selectedKeywords.length > 1 ? 's' : ''} selected.`
+                                    }
+                                </p>
+                                {isLoadingKeywords && (
+                                    <p className="text-[10px] text-accent-1">
+                                        Refreshing keywords from context...
+                                    </p>
+                                )}
+                            </div>
                             <button
                                 onClick={handleGenerate}
                                 disabled={selectedKeywords.length === 0 || isGenerating}
@@ -244,7 +293,7 @@ export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, select
                                     </>
                                 ) : (
                                     <>
-                                        Review Questions <ArrowRight size={16} />
+                                        Generate Questions <ArrowRight size={16} />
                                     </>
                                 )}
                             </button>
@@ -274,15 +323,18 @@ export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, select
         >
             <div className={cn(
                 "py-2 flex flex-col gap-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar transition-all duration-300",
-                isGenerating && "opacity-40 blur-[1px] pointer-events-none"
+                (isGenerating || (currentStep === 0 && isLoadingKeywords)) && "pointer-events-none"
             )}>
                 {currentStep === 0 ? (
-                    <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                        <p className="text-sm font-semibold text-gray-500 px-1">
-                            Shaping context for: <span className="text-foreground">{selectedCompanies.map(c => c.company_name).join(' & ')}</span>
-                        </p>
+                    <div className="flex flex-col gap-4">
+                        <div className="flex items-center justify-between px-1">
+                            <p className="text-sm font-semibold text-gray-500">
+                                Shaping context for: <span className="text-foreground">{selectedCompanies.map(c => c.company_name).join(' & ')}</span>
+                            </p>
+                            {isLoadingKeywords && <Loader2 size={14} className="text-accent-1" />}
+                        </div>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                            {AVAILABLE_KEYWORDS.map((kw) => {
+                            {normalizedKeywords.map((kw) => {
                                 const isSelected = selectedKeywords.includes(kw);
                                 return (
                                     <button
@@ -308,7 +360,7 @@ export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, select
                         </div>
                     </div>
                 ) : (
-                    <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-right-4 duration-500">
+                    <div className="flex flex-col gap-3">
                         {generatedQuestions.map((q) => (
                             <div
                                 key={q.id}
@@ -339,7 +391,7 @@ export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, select
                                     </div>
 
                                     {selectedId === q.id && (
-                                        <div className="flex items-center gap-1.5 text-accent-1 animate-in fade-in zoom-in duration-300">
+                                        <div className="flex items-center gap-1.5 text-accent-1">
                                             <div className="w-5 h-5 rounded-full bg-accent-1 text-white flex items-center justify-center">
                                                 <Check size={12} strokeWidth={3} />
                                             </div>

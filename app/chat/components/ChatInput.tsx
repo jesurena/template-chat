@@ -27,6 +27,7 @@ interface ChatInputProps {
     isDriveConnected: boolean;
     isTyping?: boolean;
     onStop?: () => void;
+    companies: Company[];
 }
 
 export function ChatInput({
@@ -42,7 +43,8 @@ export function ChatInput({
     onSkip,
     isDriveConnected,
     isTyping = false,
-    onStop
+    onStop,
+    companies
 }: ChatInputProps) {
     const { theme } = useTheme();
     const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -278,6 +280,7 @@ export function ChatInput({
                     toggleCompanySelect={toggleCompanySelect}
                     onSkip={onSkip}
                     onGenerateQuestions={onGenerateQuestions}
+                    companies={companies}
                 />
             )}
         </div>

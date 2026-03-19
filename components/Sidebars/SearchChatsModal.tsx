@@ -2,30 +2,26 @@
 
 import React, { useState } from 'react';
 import { Modal, Input } from 'antd';
-import { Search, History, MessageSquare } from 'lucide-react';
-import { mockChats } from '@/app/chat/components/mockChats';
+import { Search, History, MessageSquare, Loader2 } from 'lucide-react';
+import { useChatHistory } from '@/hooks/chat/useChat';
 
 interface SearchChatsModalProps {
     open: boolean;
     onClose: () => void;
-    onSelectChat: (messages: typeof mockChats[0]['messages']) => void;
+    onSelectChat: (chat: any) => void;
 }
 
 export default function SearchChatsModal({ open, onClose, onSelectChat }: SearchChatsModalProps) {
     const [searchQuery, setSearchQuery] = useState('');
+    const accountId = typeof window !== 'undefined' ? localStorage.getItem("AoId") : null;
+    const { data: chatHistory = [], isLoading } = useChatHistory(accountId);
 
-    const filteredChats = mockChats.filter(c =>
-        c.title.toLowerCase().includes(searchQuery.toLowerCase())
+    const filteredChats = chatHistory.filter((c: any) =>
+        c.content?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const groupedChats = filteredChats.reduce((acc, chat) => {
-        if (!acc[chat.date]) acc[chat.date] = [];
-        acc[chat.date].push(chat);
-        return acc;
-    }, {} as Record<string, typeof mockChats>);
-
-    const handleSelectChat = (messages: typeof mockChats[0]['messages']) => {
-        onSelectChat(messages);
+    const handleSelectChat = (chat: any) => {
+        onSelectChat(chat);
         setSearchQuery('');
     };
 
@@ -58,38 +54,35 @@ export default function SearchChatsModal({ open, onClose, onSelectChat }: Search
             </div>
 
             <div className="flex flex-col gap-6 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                {Object.entries(groupedChats).length > 0 ? (
-                    Object.entries(groupedChats).map(([dateLabel, chats]) => (
-                        <div key={dateLabel} className="flex flex-col gap-2">
-                            <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">{dateLabel}</h4>
-                            <div className="flex flex-col gap-1">
-                                {chats.map(chat => (
-                                    <button
-                                        key={chat.id}
-                                        onClick={() => handleSelectChat(chat.messages)}
-                                        className="flex items-start justify-between p-3 rounded-xl border border-transparent hover:border-border hover:bg-neutral/50 transition-all text-left group"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-full bg-accent-1/10 flex items-center justify-center shrink-0 group-hover:bg-accent-1/20 transition-colors">
-                                                <MessageSquare size={14} className="text-accent-1" />
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-md font-semibold text-foreground group-hover:text-accent-1 transition-colors">
-                                                    {chat.title}
-                                                </span>
-                                                <span className="text-xs text-gray-500">
-                                                    AppDev Central context
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <span className="text-xs font-medium text-gray-400 whitespace-nowrap pt-1">
-                                            {chat.time}
+                {isLoading ? (
+                    <div className="py-12 flex flex-col items-center justify-center text-gray-400">
+                        <Loader2 className="w-8 h-8 animate-spin mb-3 opacity-50" />
+                        <p className="text-sm">Loading chats...</p>
+                    </div>
+                ) : filteredChats.length > 0 ? (
+                    <div className="flex flex-col gap-1">
+                        {filteredChats.map((chat: any) => (
+                            <button
+                                key={chat.chat_id}
+                                onClick={() => handleSelectChat(chat)}
+                                className="flex items-start justify-between p-3 rounded-xl border border-transparent hover:border-border hover:bg-neutral/50 transition-all text-left group"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-accent-1/10 flex items-center justify-center shrink-0 group-hover:bg-accent-1/20 transition-colors">
+                                        <MessageSquare size={14} className="text-accent-1" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-md font-semibold text-foreground group-hover:text-accent-1 transition-colors">
+                                            {chat.content}
                                         </span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    ))
+                                        <span className="text-xs text-gray-500">
+                                            AppDev Central context
+                                        </span>
+                                    </div>
+                                </div>
+                            </button>
+                        ))}
+                    </div>
                 ) : (
                     <div className="py-12 flex flex-col items-center justify-center text-gray-400">
                         <Search size={32} className="mb-3 opacity-20" />

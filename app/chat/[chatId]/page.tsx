@@ -1,35 +1,60 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ChatIntro } from './components/ChatIntro';
-import { ChatInput } from './components/ChatInput';
-import { ChatMessages } from './components/ChatMessages';
-import { QuickQuestions, QuickQuestion } from './components/ChatQuickQuestions';
-import { GeneratedQuestionsModal, getGeneratedQuestions } from './components/GeneratedQuestionsModal';
-import { DriveConnectModal } from './components/DriveConnectModal';
-import { useChat, useGenerateKeywords } from '@/hooks/chat/useChat';
+import { useParams } from 'next/navigation';
+import { ChatInput } from '../components/ChatInput';
+import { ChatMessages } from '../components/ChatMessages';
+import { QuickQuestions, QuickQuestion } from '../components/ChatQuickQuestions';
+import { GeneratedQuestionsModal, getGeneratedQuestions } from '../components/GeneratedQuestionsModal';
+import { DriveConnectModal } from '../components/DriveConnectModal';
+import { useChat, useLoadChatHistory, useGenerateKeywords } from '@/hooks/chat/useChat';
 import { Company } from '@/interface/Chat';
 import { useDrive } from '@/components/Providers/drive-provider';
-import { Navbar } from './components/Navbar';
-import { cn } from '@/utils/cn';
+import { Navbar } from '../components/Navbar';
 import { useCompanies } from '@/hooks/chat/useCompanies';
+import { Loader2 } from 'lucide-react';
 
-export default function ChatPage() {
+export default function ChatHistoryPage() {
+    const params = useParams();
+    const chatId = params.chatId as string;
+
     const [inputValue, setInputValue] = useState('');
-    const { messages, isTyping, sendMessage, stopTyping, streamingText } = useChat();
+    const { messages, isTyping, sendMessage, stopTyping, streamingText, loadChat, chatId: currentChatId } = useChat();
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [mounted, setMounted] = useState(false);
+    const { mutateAsync: fetchHistory } = useLoadChatHistory();
+    const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
-    // Google Drive connection state (shared via context)
     const { isDriveConnected, isDriveModalOpen, setIsDriveModalOpen, driveFiles } = useDrive();
 
     const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
     const [selectedCompanies, setSelectedCompanies] = useState<Company[]>([]);
-    const { data: companies = [], isLoading: isCompaniesLoading } = useCompanies();
+    const { data: companies = [] } = useCompanies();
 
     const [isGeneratedQuestionsModalOpen, setIsGeneratedQuestionsModalOpen] = useState(false);
-
     const [customQuickQuestions, setCustomQuickQuestions] = useState<QuickQuestion[]>([]);
+
+    useEffect(() => {
+        const loadInitialHistory = async () => {
+            // Only fetch if we don't have this chat loaded yet
+            if (!chatId || (chatId === currentChatId && messages.length > 0)) {
+                setIsLoadingHistory(false);
+                return;
+            }
+
+            try {
+                setIsLoadingHistory(true);
+                const data = await fetchHistory(chatId);
+                loadChat(data.messages, data.chatId, data.sessionId);
+            } catch (error) {
+                console.error("Failed to load chat history:", error);
+            } finally {
+                setIsLoadingHistory(false);
+            }
+        };
+
+        loadInitialHistory();
+    }, [chatId, fetchHistory, loadChat, currentChatId, messages.length]);
 
     useEffect(() => {
         if (selectedCompanies.length > 0) {
@@ -77,7 +102,6 @@ export default function ChatPage() {
         setInputValue('');
     };
 
-    // Actions
     const [generatedKeywords, setGeneratedKeywords] = useState<any>(null);
     const generateKeywordsMutation = useGenerateKeywords();
 
@@ -129,30 +153,16 @@ export default function ChatPage() {
                 isDriveConnected={isDriveConnected}
                 onDriveClick={() => setIsDriveModalOpen(true)}
                 isDownloadable={messages.length > 0}
-                onDownloadClick={() => {/* Implement download functionality here */ }}
+                onDownloadClick={() => {}}
             />
 
             <div className="flex-1 overflow-y-auto bg-chat-bg scrollbar-hide">
                 <div className="max-w-4xl mx-auto min-h-full flex flex-col pl-16 pr-4 md:px-0">
-                    {messages.length === 0 ? (
-                        <ChatIntro
-                            companies={companies}
-                            selectedCompanies={selectedCompanies}
-                            toggleCompanySelect={toggleCompanySelect}
-                            onMoreClick={() => setIsCompanyModalOpen(true)}
-                            onGenerateQuestions={handleGenerateQuestions}
-                            onSkip={handleSkip}
-                            isDriveConnected={isDriveConnected}
-                            onSuggestionClick={handleInsertQuestion}
-                            driveFiles={driveFiles}
-                        />
-                    ) : (
-                        <ChatMessages 
-                            messages={messages} 
-                            isTyping={isTyping} 
-                            streamingText={streamingText}
-                        />
-                    )}
+                    <ChatMessages
+                        messages={messages}
+                        isTyping={isTyping}
+                        streamingText={streamingText}
+                    />
                     <div ref={messagesEndRef} className="h-4" />
                 </div>
             </div>
