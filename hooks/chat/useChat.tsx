@@ -90,18 +90,11 @@ export const useGenerateKeywords = () => {
 
 export const useGenerateQuestions = () => {
     return useMutation({
-        mutationFn: async ({ keywords }: { keywords: string[] }) => {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}generate_questions_from_keywords`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ keywords }),
+        mutationFn: async ({ keywords, companiesPayload }: { keywords: string[]; companiesPayload: any[] }) => {
+            const { data } = await api.post('/generate_questions', {
+                company: companiesPayload[0],
+                keywords: keywords
             });
-            
-            if (!res.ok) {
-                throw new Error('Failed to generate questions');
-            }
-            
-            const data = await res.json();
             return data.data || [];
         }
     });

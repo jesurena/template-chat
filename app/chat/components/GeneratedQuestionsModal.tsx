@@ -189,7 +189,8 @@ export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, select
         setIsGenerating(true);
         try {
             const result = await generateQuestionsMutation.mutateAsync({
-                keywords: selectedKeywords
+                keywords: selectedKeywords,
+                companiesPayload: selectedCompanies
             });
 
             // Map API response to GeneratedQuestion[]

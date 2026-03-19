@@ -154,12 +154,14 @@ export function ChatIntro({
                 </div>
             )}
 
-            <button
-                onClick={onMoreClick}
-                className="text-accent-1 hover:text-accent-1/80 font-semibold mb-8 flex items-center gap-1 hover:gap-2 transition-all px-4 py-2"
-            >
-                View {dataSource.length > 3 ? `${dataSource.length - 3} more` : 'all'} companies <ArrowRight size={16} />
-            </button>
+            {dataSource.length > 3 && (
+                <button
+                    onClick={onMoreClick}
+                    className="text-accent-1 hover:text-accent-1/80 font-semibold mb-8 flex items-center gap-1 hover:gap-2 transition-all px-4 py-2"
+                >
+                    View {dataSource.length > 3 ? `${dataSource.length - 3} more` : 'all'} companies <ArrowRight size={16} />
+                </button>
+            )}
 
             {/* Action buttons appear if anything is selected */}
             <div className={cn(
