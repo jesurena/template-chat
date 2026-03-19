@@ -1,55 +1,43 @@
 # Agent Configuration - AppDev Central
 
-## 🎨 Color Theme
-Use these CSS variables or Tailwind classes for all UI elements to ensure a premium, consistent look:
+## 🎨 Color Theme & Design System
+All UI elements must use the semantic theme variables defined in `app/globals.css`. **NEVER** use hardcoded hex colors or arbitrary pixel values in components.
 
-- **Primary**: `#0F2A44` (Deep Navy - `--primary`, `bg-primary`, `text-primary`)
-- **Accent 1**: `#1677ff` (Electric Blue - `--accent-1`, `bg-accent-1`, `text-accent-1`)
-- **Accent 2**: `#FF8A3D` (Vibrant Orange - `--accent-2`, `bg-accent-2`, `text-accent-2`)
-- **Neutral**: `#F8FAFC` (Ghost White - `--neutral`, `bg-neutral`, `text-neutral`)
+- **Background**: `bg-background` (`--background`)
+- **Foreground**: `text-foreground` (`--foreground`)
+- **Primary**: `bg-primary`, `text-primary` (`--primary`)
+- **Accent 1**: `bg-accent-1`, `text-accent-1` (`--accent-1`)
+- **Accent 2**: `bg-accent-2`, `text-accent-2` (`--accent-2`)
+- **Neutral**: `bg-neutral`, `text-neutral` (`--neutral`)
+- **Border**: `border-border` (`--border`)
+- **Sidebar**: `bg-sidebar` (`--sidebar-bg`)
+- **Chat BG**: `bg-chat-bg` (`--chat-bg`)
 
 ## 📁 Directory Structure Rules
 Maintain the following structure for all new files and refactors:
 
 ```text
 /appdev-central
-├── app/               # Next.js 15 App Router (auth, dashboard, api)
-│   └── landingcomponents/ # Specific components for the landing/marketing page
-├── components/        # General feature-based components (Avatar, Table, Users, etc.)
-├── lib/               # API configuration (axios, queryClient)
-├── services/          # Pure business logic and API calls
-├── hooks/             # Custom React hooks (TanStack Query)
-├── interface/         # TypeScript definitions (matching backend PascalCase)
-├── utils/             # Helpers (formatters, validators)
-├── public/            # Static assets
+├── app/               # Next.js 15 App Router
+│   └── [feature]/components/ # Feature-specific components
+├── components/        # Global shared components
+├── lib/               # Shared libraries (api.ts, query-provider.tsx)
+├── hooks/             # Custom TanStack Query hooks (structured by feature)
+├── utils/             # Helper utilities (googleLogin.ts, clipboard.ts)
+├── interface/         # TypeScript definitions
 └── styles/            # Global Tailwind/CSS layers
 ```
 
-## ✨ Common Components
-
-### 1. StatusChip (Table Status)
-Always use the `StatusChip` component for boolean statuses in tables (Active/Inactive).
-- **Location**: `@/components/Table/StatusChip`
-- **Props**: `status: boolean`
-- **Usage**: `<StatusChip status={record.isActive} />`
-
-### 2. UserAvatar (Profile Pictures & Initials)
-Always use `UserAvatar` for any user-related profile icon. It handles initials with a deterministic background if the image is missing.
-- **Location**: `@/components/Avatar/UserAvatar`
-- **Props**: `src`, `domainAccount`, `name`, `size`
-- **Usage**: `<UserAvatar src={user.GAvatar} domainAccount={user.DomainAccount} size={40} />`
-
 ## 🛠️ Implementation Guidelines
 
-1.  **Styling**: Always use the defined theme colors and Tailwind 4 utility classes. Avoid hardcoded hex values in components.
-2.  **Components**: Prioritize creating reusable components in `components/` and using existing ones.
-3.  **Tables**: Consistently use `StatusChip` for boolean flags and `UserAvatar` for user entries.
-4.  **Logic**: Keep complex business logic and raw API calls in `services/`, not in the components.
-5.  **Naming**: Use `PascalCase` for components and `camelCase` for hooks/utils.
-6.  **Forms**: Exclusively use `Form` and `Input` from `antd` for forms; implement clear validation rules.
-7.  **Buttons**: Always use `Button` from `antd` instead of standard HTML `<button>` elements for consistency.
-8.  **Data**: Always use organized TanStack Query hooks in `hooks/` (e.g., `hooks/users/`).
-9.  **Types/Interfaces**: Refer to `@/interface/` for the correct PascalCase backend property names (e.g., `AccountID`, `AccountName`).
-10. **Notifications**: When using `notification` from `antd`, always provide both `title` and `description`. Placement must be `topRight`.
-11. **Modals**: Keep `Modal` titles as simple strings. Avoid complex custom header structures to maintain a clean layout.
-12. **Route-Specific Components**: Use folders within `app/` (like `app/landingcomponents/` or `app/chat/components/`) for UI elements that are strictly used within that specific route. Use the global `components/` folder for elements shared across multiple features.
+1.  **Styling**: 
+    - **NO Hardcoded Pixels**: Do not use `text-[15px]`, `p-[10px]`, etc. Use standard Tailwind scale (`text-sm`, `p-4`, `w-full`).
+    - **NO Hex Colors**: Do not use `text-[#ffffff]`, `bg-[#000000]`. Use theme variables (`text-foreground`, `bg-background`).
+    - **NO Arbitrary Borders**: Use `border-border` for all standard borders.
+2.  **Components**: Prioritize using existing Ant Design components via the `ConfigProvider` theme.
+3.  **Hooks**: Always use the simplified TanStack Query hook pattern (e.g., `hooks/drive/useDriveQuery.ts`).
+4.  **API**: Use the centralized `api` instance from `@/lib/api` for all network requests.
+5.  **Notifications**: Use the static `message` or `notification` re-exports from `@/components/Providers/theme-provider`.
+6.  **Buttons**: Prefer Ant Design `Button` or custom semantic components over raw HTML `<button>` for key actions.
+7.  **Logic**: Keep business logic in `hooks/` or `services/`, keeping UI components clean and focused on rendering.
+8.  **Naming**: Use `PascalCase` for components/interfaces and `camelCase` for hooks/utils.

@@ -15,12 +15,12 @@ import { cn } from '@/utils/cn';
 
 export default function ChatPage() {
     const [inputValue, setInputValue] = useState('');
-    const { messages, isTyping, sendMessage, stopTyping } = useChat();
+    const { messages, isTyping, sendMessage, stopTyping, streamingText } = useChat();
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [mounted, setMounted] = useState(false);
 
     // Google Drive connection state (shared via context)
-    const { isConnectedToDrive, isDriveModalOpen, setIsDriveModalOpen } = useDrive();
+    const { isDriveConnected, isDriveModalOpen, setIsDriveModalOpen, driveFiles } = useDrive();
 
     const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
     const [selectedCompanies, setSelectedCompanies] = useState<Company[]>([]);
@@ -110,12 +110,11 @@ export default function ChatPage() {
 
     return (
         <div className="flex flex-col h-full bg-chat-bg transition-colors duration-300 relative overflow-hidden">
-            {/* Header Navbar with integrated actions */}
-            <Navbar 
-                isConnectedToDrive={isConnectedToDrive} 
+            <Navbar
+                isDriveConnected={isDriveConnected}
                 onDriveClick={() => setIsDriveModalOpen(true)}
                 isDownloadable={messages.length > 0}
-                onDownloadClick={() => {/* Implement download functionality when needed */}}
+                onDownloadClick={() => {/* Implement download functionality here */ }}
             />
 
             <div className="flex-1 overflow-y-auto bg-chat-bg scrollbar-hide">
@@ -127,19 +126,22 @@ export default function ChatPage() {
                             onMoreClick={() => setIsCompanyModalOpen(true)}
                             onGenerateQuestions={handleGenerateQuestions}
                             onSkip={handleSkip}
-                            isConnectedToDrive={isConnectedToDrive}
+                            isDriveConnected={isDriveConnected}
                             onSuggestionClick={handleInsertQuestion}
+                            driveFiles={driveFiles}
                         />
                     ) : (
-                        <ChatMessages messages={messages} isTyping={isTyping} />
+                        <ChatMessages 
+                            messages={messages} 
+                            isTyping={isTyping} 
+                            streamingText={streamingText}
+                        />
                     )}
                     <div ref={messagesEndRef} className="h-4" />
                 </div>
             </div>
 
-            {/* Quick Questions & Input Area */}
             <div className="w-full bg-chat-bg">
-                {/* Only show Quick Questions after intro and when not typing */}
                 {!isTyping && messages.length > 0 && (
                     <div className="max-w-4xl mx-auto px-4">
                         <QuickQuestions
@@ -160,13 +162,12 @@ export default function ChatPage() {
                     setIsCompanyModalOpen={setIsCompanyModalOpen}
                     onGenerateQuestions={handleGenerateQuestions}
                     onSkip={handleSkip}
-                    isConnectedToDrive={isConnectedToDrive}
+                    isDriveConnected={isDriveConnected}
                     isTyping={isTyping}
                     onStop={stopTyping}
                 />
             </div>
 
-            {/* Google Drive Connect Modal */}
             {mounted && (
                 <DriveConnectModal
                     onDisconnect={() => setSelectedCompanies([])}

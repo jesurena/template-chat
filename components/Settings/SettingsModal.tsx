@@ -7,6 +7,7 @@ import { Settings, Sun, Moon, Monitor, X, Link as LinkIcon, CheckCircle2 } from 
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useDrive } from '@/components/Providers/drive-provider';
+import { message } from '@/components/Providers/theme-provider';
 
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -50,7 +51,7 @@ const themeOptions = [
 export default function SettingsModal({ visible, onClose }: SettingsModalProps) {
     const { theme, setTheme } = useTheme();
     const [activeTab, setActiveTab] = useState<'general' | 'connections'>('general');
-    const { isConnectedToDrive, setIsConnectedToDrive, setIsDriveModalOpen } = useDrive();
+    const { isDriveConnected, setisDriveConnected, setIsDriveModalOpen } = useDrive();
 
     return (
         <Modal
@@ -150,12 +151,12 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
                                     <img
                                         src="/gdrive.svg"
                                         alt="Google Drive"
-                                        className={cn("w-10 h-10 transition-all", !isConnectedToDrive && "grayscale opacity-50")}
+                                        className={cn("w-10 h-10 transition-all", !isDriveConnected && "grayscale opacity-50")}
                                     />
                                     <div className="flex flex-col">
                                         <div className="flex items-center gap-2">
                                             <span className="font-semibold text-foreground">Google Drive</span>
-                                            {isConnectedToDrive && (
+                                            {isDriveConnected && (
                                                 <span className="flex items-center gap-1 text-xs font-bold text-green-600">
                                                     <CheckCircle2 size={11} />
                                                     Connected
@@ -169,14 +170,15 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
                                 </div>
                                 <Button
                                     onClick={() => {
-                                        if (isConnectedToDrive) {
-                                            setIsConnectedToDrive(false);
+                                        if (isDriveConnected) {
+                                            message.error('This function is not yet implemented.');
+                                            // setisDriveConnected(false);
                                         } else {
-                                            setIsConnectedToDrive(true);
+                                            setisDriveConnected(true);
                                         }
                                     }}
                                 >
-                                    {isConnectedToDrive ? "Disconnect" : "Connect"}
+                                    {isDriveConnected ? "Disconnect" : "Connect"}
                                 </Button>
                             </div>
                         </div>

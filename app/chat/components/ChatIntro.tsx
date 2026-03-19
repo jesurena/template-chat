@@ -17,8 +17,9 @@ interface ChatIntroProps {
     onMoreClick: () => void;
     onGenerateQuestions: () => void;
     onSkip: () => void;
-    isConnectedToDrive: boolean;
+    isDriveConnected: boolean;
     onSuggestionClick: (prompt: string) => void;
+    driveFiles?: any[];
 }
 
 export function ChatIntro({
@@ -27,12 +28,13 @@ export function ChatIntro({
     onMoreClick,
     onGenerateQuestions,
     onSkip,
-    isConnectedToDrive,
-    onSuggestionClick
+    isDriveConnected,
+    onSuggestionClick,
+    driveFiles = []
 }: ChatIntroProps) {
     const initialCompanies = mockCompanies.slice(0, 3);
 
-    if (!isConnectedToDrive) {
+    if (!isDriveConnected) {
         const suggestions = [
             {
                 title: 'Project Setup',
@@ -128,6 +130,26 @@ export function ChatIntro({
                     );
                 })}
             </div>
+
+            {isDriveConnected && driveFiles.length > 0 && (
+                <div className="w-full max-w-4xl mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+                        <Box size={16} className="text-accent-1" />
+                        Connected Drive Files ({driveFiles.length})
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                        {driveFiles.map((file) => (
+                            <div
+                                key={file.id}
+                                className="flex items-center gap-2 px-3 py-1.5 bg-neutral/50 border border-border rounded-lg text-xs font-medium text-foreground/70 hover:border-accent-1/30 hover:bg-neutral transition-all cursor-default group"
+                            >
+                                <img src="/gdrive.svg" alt="" className="w-3.5 h-3.5 grayscale group-hover:grayscale-0 transition-all" />
+                                <span className="truncate max-w-[150px]">{file.name}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <button
                 onClick={onMoreClick}

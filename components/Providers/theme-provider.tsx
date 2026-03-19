@@ -109,12 +109,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                         : undefined,
                 }}
             >
-                <div style={{ display: 'none' }}>
-                    <App>
-                        <StaticApp />
-                    </App>
-                </div>
-                {children}
+                <App>
+                    <StaticApp />
+                    {children}
+                </App>
             </ConfigProvider>
         </ThemeContext.Provider>
     );

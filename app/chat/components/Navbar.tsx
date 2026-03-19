@@ -7,7 +7,7 @@ import type { MenuProps } from 'antd';
 import { cn } from '@/utils/cn';
 
 interface NavbarProps {
-    isConnectedToDrive: boolean;
+    isDriveConnected: boolean;
     onDriveClick: () => void;
     isDownloadable?: boolean;
     onDownloadClick?: (format: 'pdf' | 'txt') => void;
@@ -18,7 +18,7 @@ interface NavbarProps {
  * Houses the GDrive connection status and optional download/export actions.
  */
 export function Navbar({
-    isConnectedToDrive,
+    isDriveConnected,
     onDriveClick,
     isDownloadable = false,
     onDownloadClick
@@ -61,12 +61,12 @@ export function Navbar({
                 >
                     <div className={cn(
                         "flex items-center justify-center w-8 h-8 mr-1.5 rounded-full transition-all",
-                        !isConnectedToDrive && "opacity-60 grayscale bg-neutral-200"
+                        !isDriveConnected && "opacity-60 grayscale bg-neutral-200"
                     )}>
                         <img src="/gdrive.svg" className="w-5 h-5" alt="GDrive" />
                     </div>
                     <span className="text-[14px] font-semibold text-foreground/80">
-                        {isConnectedToDrive ? "Connected" : "Connect GDrive"}
+                        {isDriveConnected ? "Connected" : "Connect GDrive"}
                     </span>
                 </button>
             </div>

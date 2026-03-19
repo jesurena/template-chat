@@ -1,19 +1,18 @@
-export type MessageStatus = 'sending' | 'sent' | 'delivered';
+export type MessageRole = 'user' | 'assistant';
 
 export interface ChatMessage {
-    AccountID: string;
-    Nickname: string;
-    Text: string;
-    IsUser: boolean;
-    Timestamp: string;
-    Status?: MessageStatus;
+    role: MessageRole;
+    content: string;
 }
 
 export interface ChatThread {
-    ThreadID: string;
-    Title: string;
-    LastMessage: string;
-    UpdatedAt: string;
+    id?: string;
+    session_id?: string;
+    session_name?: string;
+    ThreadID?: string;
+    Title?: string;
+    title?: string;
+    messages?: ChatMessage[];
 }
 
 export interface Company {

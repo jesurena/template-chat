@@ -24,7 +24,7 @@ interface ChatInputProps {
     setIsCompanyModalOpen: (open: boolean) => void;
     onGenerateQuestions: () => void;
     onSkip: () => void;
-    isConnectedToDrive: boolean;
+    isDriveConnected: boolean;
     isTyping?: boolean;
     onStop?: () => void;
 }
@@ -40,7 +40,7 @@ export function ChatInput({
     setIsCompanyModalOpen,
     onGenerateQuestions,
     onSkip,
-    isConnectedToDrive,
+    isDriveConnected,
     isTyping = false,
     onStop
 }: ChatInputProps) {
@@ -187,12 +187,12 @@ export function ChatInput({
                                 <button
                                     className={cn(
                                         "p-2.5 rounded-full transition-colors mb-0.5 ml-0.5 shrink-0",
-                                        isConnectedToDrive && !isTyping
+                                        isDriveConnected && !isTyping
                                             ? "text-gray-500 hover:bg-gray-200"
                                             : "text-gray-300 cursor-not-allowed"
                                     )}
-                                    title={isTyping ? "Wait for response..." : isConnectedToDrive ? "More options" : "Connect Google Drive to select clients"}
-                                    disabled={!isConnectedToDrive || isTyping}
+                                    title={isTyping ? "Wait for response..." : isDriveConnected ? "More options" : "Connect Google Drive to select clients"}
+                                    disabled={!isDriveConnected || isTyping}
                                 >
                                     <Plus size={20} />
                                 </button>

@@ -1,26 +1,37 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { useDriveStatus, useDriveFiles } from '@/hooks/drive/useDriveQuery';
+import { DriveFile } from '@/interface/Drive';
 
 interface DriveContextType {
-    isConnectedToDrive: boolean;
-    setIsConnectedToDrive: (connected: boolean) => void;
+    isDriveConnected: boolean;
+    setisDriveConnected: (connected: boolean) => void; 
     isDriveModalOpen: boolean;
     setIsDriveModalOpen: (open: boolean) => void;
+    driveFiles: DriveFile[];
+    isLoadingFiles: boolean;
 }
 
 const DriveContext = createContext<DriveContextType | undefined>(undefined);
 
 export function DriveProvider({ children }: { children: ReactNode }) {
-    const [isConnectedToDrive, setIsConnectedToDrive] = useState(false);
-    const [isDriveModalOpen, setIsDriveModalOpen] = useState(true);
+    const [isDriveModalOpen, setIsDriveModalOpen] = useState(false);
+    const [manualConnected, setManualConnected] = useState<boolean | null>(null);
+
+    const { data: driveStatusData } = useDriveStatus();
+    const isDriveConnected = manualConnected ?? (driveStatusData?.status === "connected");
+
+    const { data: filesData, isLoading: isLoadingFiles } = useDriveFiles(isDriveConnected);
 
     return (
         <DriveContext.Provider value={{
-            isConnectedToDrive,
-            setIsConnectedToDrive,
+            isDriveConnected,
+            setisDriveConnected: (connected: boolean) => setManualConnected(connected),
             isDriveModalOpen,
-            setIsDriveModalOpen
+            setIsDriveModalOpen,
+            driveFiles: filesData || [],
+            isLoadingFiles,
         }}>
             {children}
         </DriveContext.Provider>

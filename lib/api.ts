@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { notification } from 'antd';
+import { notification } from '@/components/Providers/theme-provider';
 
 const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL,

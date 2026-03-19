@@ -9,20 +9,31 @@ import type { MenuProps } from 'antd';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
-import SettingsModal from './Settings/SettingsModal';
-import SearchChatsModal from './Sidebars/SearchChatsModal';
-import { useChat } from '@/hooks/chat/useChat';
-import { mockChats } from '@/app/chat/components/mockChats';
-const useAuth = () => ({
-    user: {
-        Nickname: 'Admin User',
-        Email: 'admin@appdev.com',
-        AccountName: 'Admin',
-        GAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin'
-    },
-    isLoading: false
-});
-const useLogout = () => ({ mutate: () => console.log('Logout') });
+import SettingsModal from '../Settings/SettingsModal';
+import SearchChatsModal from './SearchChatsModal';
+import { useChat, useChatHistory } from '@/hooks/chat/useChat';
+import { useGoogle } from '@/hooks/auth/useGoogle';
+import { User } from '@/interface/User';
+
+const useLocalAuth = () => {
+    const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    React.useEffect(() => {
+        const uName = localStorage.getItem('uName') || 'Guest User';
+        const uEmail = localStorage.getItem('uEmail') || 'Not Set';
+
+        setUser({
+            Nickname: uName,
+            Email: uEmail,
+            AccountName: uName,
+            GAvatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(uName)}`
+        });
+        setIsLoading(false);
+    }, []);
+
+    return { user, isLoading };
+};
 
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -33,11 +44,24 @@ export default function Sidebar() {
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-    const { user, isLoading } = useAuth();
-    const { mutate: logout } = useLogout();
+    const { user, isLoading } = useLocalAuth();
+    const { logout } = useGoogle();
     const { resetChat, loadChat } = useChat();
 
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+    const [isClientReady, setIsClientReady] = useState(false);
+    const accountId = typeof window !== 'undefined' ? localStorage.getItem("AoId") : null;
+    const { data: chatHistory = [], isLoading: isChatsLoading } = useChatHistory(accountId);
+
+    React.useEffect(() => {
+        setIsClientReady(true);
+    }, []);
+
+    const handleLogout = () => {
+        logout();
+    };
+
+
 
     const userMenuItems: MenuProps['items'] = [
         {
@@ -58,7 +82,7 @@ export default function Sidebar() {
                     <span>Logout</span>
                 </div>
             ),
-            onClick: () => logout(),
+            onClick: handleLogout,
         },
     ];
 
@@ -144,22 +168,33 @@ export default function Sidebar() {
                         Your chats
                     </h3>
                     <div className="flex flex-col gap-0.5 mt-2">
-                        {mockChats.slice(0, 4).map(chat => (
-                            <button
-                                key={chat.id}
-                                onClick={() => {
-                                    loadChat(chat.messages);
-                                    if (pathname !== '/chat') {
-                                        router.push('/chat');
-                                    }
-                                    setIsOpen(false);
-                                }}
-                                className="flex items-center gap-2.5 px-3 py-2 text-sm text-text hover:bg-neutral rounded-lg transition-colors text-left w-full group"
-                            >
-                                <MessageSquare size={14} className="shrink-0 text-gray-400 group-hover:text-accent-1 transition-colors" />
-                                <span className="truncate flex-1 font-medium">{chat.title}</span>
-                            </button>
-                        ))}
+                        {isClientReady && isChatsLoading ? (
+                            <div className="flex justify-center p-2 mt-2">
+                                <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
+                            </div>
+                        ) : isClientReady && chatHistory.length > 0 ? (
+                            chatHistory.slice(0, 4).map((chat, idx) => (
+                                <button
+                                    key={chat.id || chat.session_id || idx}
+                                    onClick={() => {
+                                        // The backend might return standard mockChat signature or custom
+                                        if (chat.messages) {
+                                            loadChat(chat.messages);
+                                        }
+                                        if (pathname !== '/chat') {
+                                            router.push('/chat');
+                                        }
+                                        setIsOpen(false);
+                                    }}
+                                    className="flex items-center gap-2.5 px-3 py-2 text-sm text-text hover:bg-neutral rounded-lg transition-colors text-left w-full group"
+                                >
+                                    <MessageSquare size={14} className="shrink-0 text-gray-400 group-hover:text-accent-1 transition-colors" />
+                                    <span className="truncate flex-1 font-medium">{chat.title || chat.session_name || 'Chat ' + (idx + 1)}</span>
+                                </button>
+                            ))
+                        ) : isClientReady ? (
+                            <div className="px-3 py-2 text-xs text-gray-500 text-center">No recent chats found</div>
+                        ) : null}
                     </div>
                 </div>
             </div>
@@ -209,13 +244,6 @@ export default function Sidebar() {
                     </button>
                     <span className="font-bold text-foreground">AppDev Central</span>
                 </div>
-                <Avatar
-                    src={user?.GAvatar}
-                    size={32}
-                    className="bg-accent-1 text-white font-bold shadow-sm"
-                >
-                    {user?.AccountName?.charAt(0) || 'U'}
-                </Avatar>
             </header>
 
             <div

@@ -2,7 +2,7 @@ import "./globals.css";
 import QueryProvider from "@/components/Providers/query-provider";
 import { ThemeProvider } from "@/components/Providers/theme-provider";
 import { DriveProvider } from "@/components/Providers/drive-provider";
-import { ChatProvider } from "@/hooks/chat/useChat";
+import { ChatProvider } from "@/components/Providers/chat-provider";
 
 export default function RootLayout({
   children,

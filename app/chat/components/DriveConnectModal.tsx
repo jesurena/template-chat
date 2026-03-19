@@ -4,13 +4,14 @@ import React, { useState } from 'react';
 import { Modal } from 'antd';
 import { useDrive } from '@/components/Providers/drive-provider';
 import { Loader2 } from 'lucide-react';
+import { message } from '@/components/Providers/theme-provider';
 
 interface DriveConnectModalProps {
     onDisconnect: () => void;
 }
 
 export function DriveConnectModal({ onDisconnect }: DriveConnectModalProps) {
-    const { isConnectedToDrive, setIsConnectedToDrive, isDriveModalOpen, setIsDriveModalOpen } = useDrive();
+    const { isDriveConnected, setisDriveConnected, isDriveModalOpen, setIsDriveModalOpen } = useDrive();
     const [isConnecting, setIsConnecting] = useState(false);
 
     return (
@@ -26,10 +27,10 @@ export function DriveConnectModal({ onDisconnect }: DriveConnectModalProps) {
             <img
                 src="/gdrive.svg"
                 alt="Google Drive"
-                className={`w-16 h-16 mx-auto mb-5 transition-all duration-300 ${!isConnectedToDrive ? "opacity-40 grayscale" : ""}`}
+                className={`w-16 h-16 mx-auto mb-5 transition-all duration-300 ${!isDriveConnected ? "opacity-40 grayscale" : ""}`}
             />
 
-            {isConnectedToDrive ? (
+            {isDriveConnected ? (
                 <>
                     <h3 className="text-xl font-bold text-foreground mb-3">Google Drive is Connected</h3>
                     <p className="text-sm text-gray-500 mb-8 max-w-sm mx-auto">
@@ -44,9 +45,8 @@ export function DriveConnectModal({ onDisconnect }: DriveConnectModalProps) {
                         </button>
                         <button
                             onClick={() => {
-                                setIsConnectedToDrive(false);
+                                message.error('This function is not yet implemented.');
                                 setIsDriveModalOpen(false);
-                                onDisconnect();
                             }}
                             className="text-gray-500 hover:text-red-500 font-medium transition-colors text-sm"
                         >
@@ -66,7 +66,7 @@ export function DriveConnectModal({ onDisconnect }: DriveConnectModalProps) {
                             onClick={() => {
                                 setIsConnecting(true);
                                 setTimeout(() => {
-                                    setIsConnectedToDrive(true);
+                                    setisDriveConnected(true);
                                     setIsConnecting(false);
                                     setIsDriveModalOpen(false);
                                 }, 3000);
