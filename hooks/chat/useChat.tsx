@@ -7,12 +7,18 @@ import { streamChatResponse } from '@/utils/chat';
 
 export { useChat } from '@/components/Providers/chat-provider';
 
+/**
+ * API Endpoints (Easier to adjust and debug here)
+ */
+const GET_CHAT_HISTORY_URL = '/chat_list';
+const POST_STREAM_CHAT_URL = 'chat_stream';
+
 export const useChatHistory = (accountId: string | null) => {
     return useQuery<ChatThread[]>({
         queryKey: ['chat-history', accountId],
         queryFn: async () => {
             if (!accountId) return [];
-            const { data } = await api.get(`/chat_list?accountId=${accountId}`);
+            const { data } = await api.get(`${GET_CHAT_HISTORY_URL}?accountId=${accountId}`);
             return data.chats || [];
         },
         enabled: !!accountId,
@@ -26,9 +32,15 @@ export const useStreamMessage = (
 ) => {
     const queryClient = useQueryClient();
 
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL?.endsWith('/') 
+        ? process.env.NEXT_PUBLIC_API_URL 
+        : `${process.env.NEXT_PUBLIC_API_URL}/`;
+    
+    const streamUrl = `${baseUrl}${POST_STREAM_CHAT_URL}`;
+
     return useMutation({
         mutationFn: async ({ prompt, history, controller }: { prompt: string, history: ChatMessage[], controller: AbortController }) => {
-            return await streamChatResponse(prompt, history, controller, onChunk);
+            return await streamChatResponse(streamUrl, prompt, history, controller, onChunk);
         },
         onSuccess: (data) => {
             onComplete(data);

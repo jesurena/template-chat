@@ -6,7 +6,9 @@ import { ChatMessage, MessageRole } from '@/interface/Chat';
 export const createMessage = (content: string, role: MessageRole): ChatMessage => {
     return {
         role,
-        content
+        content,
+        Timestamp: new Date().toISOString(),
+        Status: role === 'user' ? 'sent' : 'delivered'
     };
 };
 
@@ -14,18 +16,15 @@ export const createMessage = (content: string, role: MessageRole): ChatMessage =
  * Executes a streaming chat request to the backend.
  */
 export const streamChatResponse = async (
+    url: string,
     prompt: string, 
     history: ChatMessage[], 
     controller: AbortController,
     onChunk: (text: string) => void
 ) => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL?.endsWith('/') 
-        ? process.env.NEXT_PUBLIC_API_URL 
-        : `${process.env.NEXT_PUBLIC_API_URL}/`;
-    
     const token = typeof window !== 'undefined' ? localStorage.getItem('jwt_token') : null;
 
-    const response = await fetch(`${baseUrl}chat_stream`, {
+    const response = await fetch(url, {
         method: 'POST',
         headers: { 
             'Content-Type': 'application/json',

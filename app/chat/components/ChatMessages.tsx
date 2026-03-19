@@ -6,7 +6,7 @@ import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { RobotOutlined, CopyOutlined } from '@ant-design/icons';
+import { RobotOutlined, CopyOutlined, CheckOutlined } from '@ant-design/icons';
 import { Loader2 } from 'lucide-react';
 import { Avatar, Tooltip } from 'antd';
 import { ChatMessage } from '@/interface/Chat';
@@ -24,6 +24,20 @@ interface ChatMessagesProps {
 
 export function ChatMessages({ messages, isTyping, streamingText }: ChatMessagesProps) {
     const isUser = (role: string) => role === 'user';
+    const [mounted, setMounted] = React.useState(false);
+
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    const formatTime = (timestamp?: string) => {
+        if (!mounted || !timestamp) return "";
+        try {
+            return new Date(timestamp).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        } catch (e) {
+            return "";
+        }
+    };
 
     return (
         <div className="py-6 space-y-6 px-4 md:px-0">
@@ -64,6 +78,24 @@ export function ChatMessages({ messages, isTyping, streamingText }: ChatMessages
                                 </div>
                             )}
                         </div>
+                    </div>
+                    
+                    {/* Timestamp & Status Rendering */}
+                    <div className={cn(
+                        "flex items-center gap-1.5 px-1 mt-1",
+                        isUser(msg.role) ? "" : "ml-10"
+                    )}>
+                        <span className="text-[12px] text-gray-400 font-medium">
+                            {formatTime(msg.Timestamp)}
+                        </span>
+                        {isUser(msg.role) && (
+                            <div className="flex items-center -space-x-1.5">
+                                <CheckOutlined className="text-[11px] text-accent-1 font-bold" />
+                                {msg.Status === 'delivered' && (
+                                    <CheckOutlined className="text-[11px] text-accent-1 font-bold" />
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             ))}

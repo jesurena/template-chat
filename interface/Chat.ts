@@ -1,8 +1,11 @@
+export type MessageStatus = 'sending' | 'sent' | 'delivered';
 export type MessageRole = 'user' | 'assistant';
 
 export interface ChatMessage {
     role: MessageRole;
     content: string;
+    Timestamp?: string;
+    Status?: MessageStatus;
 }
 
 export interface ChatThread {
