@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { DriveFile, DriveStatusResponse } from '@/interface/Drive';
 
-export const useDriveStatus = () => {
+export const useDriveStatus = (enabled: boolean = true) => {
     return useQuery<DriveStatusResponse>({
         queryKey: ['drive-status'],
         queryFn: async () => {
@@ -10,6 +10,7 @@ export const useDriveStatus = () => {
             return data;
         },
         staleTime: 5 * 60 * 1000,
+        enabled: enabled,
     });
 };
 

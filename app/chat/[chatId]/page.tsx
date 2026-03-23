@@ -36,7 +36,6 @@ export default function ChatHistoryPage() {
 
     useEffect(() => {
         const loadInitialHistory = async () => {
-            // Only fetch if we don't have this chat loaded yet
             if (!chatId || (chatId === currentChatId && messages.length > 0)) {
                 setIsLoadingHistory(false);
                 return;
@@ -54,7 +53,7 @@ export default function ChatHistoryPage() {
         };
 
         loadInitialHistory();
-    }, [chatId, fetchHistory, loadChat, currentChatId, messages.length]);
+    }, [chatId, fetchHistory, loadChat]);
 
     useEffect(() => {
         if (selectedCompanies.length > 0) {
@@ -107,7 +106,7 @@ export default function ChatHistoryPage() {
 
     const handleGenerateQuestions = async () => {
         if (selectedCompanies.length === 0) return;
-        
+
         setIsCompanyModalOpen(false);
         setIsGeneratedQuestionsModalOpen(true);
 
@@ -153,11 +152,11 @@ export default function ChatHistoryPage() {
                 isDriveConnected={isDriveConnected}
                 onDriveClick={() => setIsDriveModalOpen(true)}
                 isDownloadable={messages.length > 0}
-                onDownloadClick={() => {}}
+                onDownloadClick={() => { }}
             />
 
             <div className="flex-1 overflow-y-auto bg-chat-bg scrollbar-hide">
-                <div className="max-w-4xl mx-auto min-h-full flex flex-col pl-16 pr-4 md:px-0">
+                <div className="max-w-4xl mx-auto min-h-full flex flex-col px-0 md:px-2">
                     <ChatMessages
                         messages={messages}
                         isTyping={isTyping}

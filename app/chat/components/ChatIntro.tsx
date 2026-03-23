@@ -102,7 +102,7 @@ export function ChatIntro({
                 </p>
             </div>
 
-            <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="w-full max-w-4xl flex flex-wrap gap-4 mb-6">
                 {initialCompanies.map((company) => {
                     const isSelected = selectedCompanies.some(c => c.company_name === company.company_name);
 
@@ -116,7 +116,7 @@ export function ChatIntro({
                             key={company.company_name}
                             onClick={() => toggleCompanySelect(company)}
                             className={cn(
-                                "cursor-pointer rounded-xl border transition-all duration-200 overflow-hidden p-5 flex flex-col items-start gap-2 shadow-sm hover:shadow-md",
+                                "cursor-pointer rounded-xl border transition-all duration-200 overflow-hidden p-5 flex flex-col items-start gap-2 shadow-sm hover:shadow-md flex-1 min-w-[280px]",
                                 isSelected
                                     ? "bg-accent-1/5 border-accent-1 ring-1 ring-accent-1"
                                     : "bg-background border-border hover:border-accent-1/30"

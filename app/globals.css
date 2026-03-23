@@ -3,6 +3,8 @@
 :root {
   --background: #FFFFFF;
   --foreground: #111827;
+  --text: #111111;
+  --text-info: #616161;
   --primary: #0F2A44;
   --accent-1: #1677ff;
   --accent-2: #FF8A3D;
@@ -16,6 +18,8 @@
 .dark {
   --background: #141414;
   --foreground: #ffffff;
+  --text: #ffffff;
+  --text-info: #a1a1aa;
   --primary: #1e293b;
   --accent-1: #3b82f6;
   --accent-2: #f97316;
@@ -35,6 +39,8 @@
   --color-border: var(--border);
   --color-sidebar: var(--sidebar-bg);
   --color-chat-bg: var(--chat-bg);
+  --color-text: var(--text);
+  --color-text-info: var(--text-info);
 }
 
 body {

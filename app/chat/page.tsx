@@ -83,7 +83,7 @@ export default function ChatPage() {
 
     const handleGenerateQuestions = async () => {
         if (selectedCompanies.length === 0) return;
-        
+
         setIsCompanyModalOpen(false);
         setIsGeneratedQuestionsModalOpen(true);
 
@@ -133,7 +133,7 @@ export default function ChatPage() {
             />
 
             <div className="flex-1 overflow-y-auto bg-chat-bg scrollbar-hide">
-                <div className="max-w-4xl mx-auto min-h-full flex flex-col pl-16 pr-4 md:px-0">
+                <div className="max-w-4xl mx-auto min-h-full flex flex-col ">
                     {messages.length === 0 ? (
                         <ChatIntro
                             companies={companies}
@@ -147,9 +147,9 @@ export default function ChatPage() {
                             driveFiles={driveFiles}
                         />
                     ) : (
-                        <ChatMessages 
-                            messages={messages} 
-                            isTyping={isTyping} 
+                        <ChatMessages
+                            messages={messages}
+                            isTyping={isTyping}
                             streamingText={streamingText}
                         />
                     )}

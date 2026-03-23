@@ -40,11 +40,11 @@ export function ChatMessages({ messages, isTyping, streamingText }: ChatMessages
     };
 
     return (
-        <div className="py-6 space-y-6 px-4 md:px-0">
+        <div className="py-6 space-y-6 px-4 sm:px-2">
             {/* Regular Chat History */}
             {messages.map((msg, i) => (
                 <div key={i} className={cn("flex flex-col gap-1", isUser(msg.role) ? "items-end" : "items-start")}>
-                    <div className="flex items-end gap-2 max-w-[90%]">
+                    <div className="flex items-end gap-2 max-w-[85%]">
                         {!isUser(msg.role) && (
                             <Avatar
                                 size={32}
@@ -79,7 +79,7 @@ export function ChatMessages({ messages, isTyping, streamingText }: ChatMessages
                             )}
                         </div>
                     </div>
-                    
+
                     {/* Timestamp & Status Rendering */}
                     <div className={cn(
                         "flex items-center gap-1.5 px-1 mt-1",
