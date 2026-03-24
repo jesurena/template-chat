@@ -137,11 +137,11 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
                                 </p>
                             </div>
 
-                            <div className="mt-2 pt-6 border-t border-border">
+                            <div>
                                 <h4 className="text-sm font-medium text-foreground block mb-3">
                                     Product Tour
                                 </h4>
-                                <Button 
+                                <Button
                                     onClick={() => {
                                         onClose();
                                         setTimeout(() => startTour(), 300);
