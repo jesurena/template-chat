@@ -3,13 +3,8 @@
 import React from 'react';
 import { Building2, Sparkles, ArrowRight, LayoutGrid, Box } from 'lucide-react';
 import { Company } from '@/interface/Chat';
-import { mockCompanies } from './mockCompanies';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs));
-}
+import { getLineClamp } from '@/utils/style';
+import { cn } from '@/utils/cn';
 
 interface ChatIntroProps {
     selectedCompanies: Company[];
@@ -34,7 +29,7 @@ export function ChatIntro({
     driveFiles = [],
     companies = []
 }: ChatIntroProps) {
-    const dataSource = companies.length > 0 ? companies : mockCompanies;
+    const dataSource = companies;
     const initialCompanies = dataSource.slice(0, 3);
 
     if (!isDriveConnected) {
@@ -107,8 +102,9 @@ export function ChatIntro({
                     const isSelected = selectedCompanies.some(c => c.company_name === company.company_name);
 
                     let shortDesc = company.company_background || '';
-                    if (shortDesc.length > 150) {
-                        shortDesc = shortDesc.substring(0, 150) + '...';
+                    const limit = initialCompanies.length <= 1 ? 500 : 150;
+                    if (shortDesc.length > limit) {
+                        shortDesc = shortDesc.substring(0, limit) + '...';
                     }
 
                     return (
@@ -126,7 +122,7 @@ export function ChatIntro({
                                 <Building2 size={18} className={cn("shrink-0", isSelected ? "text-accent-1" : "text-gray-500")} />
                                 <span className={cn("truncate", isSelected ? "text-accent-1" : "text-foreground")}>{company.company_name}</span>
                             </div>
-                            <p className="text-xs md:text-sm leading-relaxed text-gray-500 line-clamp-3">
+                            <p className={cn("text-xs md:text-sm leading-relaxed text-gray-500", getLineClamp(initialCompanies.length))}>
                                 {shortDesc}
                             </p>
                         </div>
@@ -134,25 +130,6 @@ export function ChatIntro({
                 })}
             </div>
 
-            {isDriveConnected && driveFiles.length > 0 && (
-                <div className="w-full max-w-4xl mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
-                        <Box size={16} className="text-accent-1" />
-                        Connected Drive Files ({driveFiles.length})
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                        {driveFiles.map((file) => (
-                            <div
-                                key={file.id}
-                                className="flex items-center gap-2 px-3 py-1.5 bg-neutral/50 border border-border rounded-lg text-xs font-medium text-foreground/70 hover:border-accent-1/30 hover:bg-neutral transition-all cursor-default group"
-                            >
-                                <img src="/gdrive.svg" alt="" className="w-3.5 h-3.5 grayscale group-hover:grayscale-0 transition-all" />
-                                <span className="truncate max-w-[150px]">{file.name}</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
 
             {dataSource.length > 3 && (
                 <button

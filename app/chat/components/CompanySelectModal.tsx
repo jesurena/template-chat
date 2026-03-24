@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { Modal, Input, Button } from 'antd';
 import { Search, Building2, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
 import { Company } from '@/interface/Chat';
-import { mockCompanies } from './mockCompanies';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -33,7 +32,7 @@ export function CompanySelectModal({
 }: CompanySelectModalProps) {
     const [searchTerm, setSearchTerm] = useState('');
 
-    const dataSource = companies.length > 0 ? companies : mockCompanies;
+    const dataSource = companies;
     
     const filteredCompanies = dataSource.filter(c =>
         c.company_name.toLowerCase().includes(searchTerm.toLowerCase())

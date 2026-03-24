@@ -99,7 +99,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
         streamMutation.mutate({
             prompt,
-            history: updatedMessages,
+            history: messages,
             controller,
             chatId,
             sessionId,
