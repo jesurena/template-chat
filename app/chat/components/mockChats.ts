@@ -5,7 +5,7 @@ export interface MockChat {
     title: string;
     date: string;
     time: string;
-    messages: ChatMessage[];
+    messages: any[];
 }
 
 const generateTimestamp = (daysAgo: number, timeStr: string) => {

@@ -97,8 +97,8 @@ export function ChatIntro({
                 </p>
             </div>
 
-            <div className="w-full max-w-4xl flex flex-wrap gap-4 mb-6">
-                {initialCompanies.map((company) => {
+            <div id="tour-select-context" className="w-full max-w-4xl flex flex-wrap gap-4 mb-6">
+                {initialCompanies.map((company, index) => {
                     const isSelected = selectedCompanies.some(c => c.company_name === company.company_name);
 
                     let shortDesc = company.company_background || '';
@@ -110,6 +110,7 @@ export function ChatIntro({
                     return (
                         <div
                             key={company.company_name}
+                            id={index === 0 ? "tour-company-card" : undefined}
                             onClick={() => toggleCompanySelect(company)}
                             className={cn(
                                 "cursor-pointer rounded-xl border transition-all duration-200 overflow-hidden p-5 flex flex-col items-start gap-2 shadow-sm hover:shadow-md flex-1 min-w-[280px]",
@@ -133,6 +134,7 @@ export function ChatIntro({
 
             {dataSource.length > 3 && (
                 <button
+                    id="tour-more-context"
                     onClick={onMoreClick}
                     className="text-accent-1 hover:text-accent-1/80 font-semibold mb-8 flex items-center gap-1 hover:gap-2 transition-all px-4 py-2"
                 >
@@ -150,6 +152,7 @@ export function ChatIntro({
                 </p>
                 <div className="flex items-center gap-2">
                     <button
+                        id="tour-generate-questions"
                         onClick={onGenerateQuestions}
                         className="bg-accent-1 hover:opacity-90 text-white px-6 py-2.5 rounded-full font-semibold shadow-sm transition-all text-sm flex items-center gap-2"
                     >

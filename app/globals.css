@@ -186,3 +186,72 @@ body {
 .chat-markdown th {
   font-weight: 700;
 }
+
+/* Custom Driver.js Theme */
+.app-tour-theme {
+  --driver-popover-bg: var(--background);
+  --driver-popover-text: var(--foreground);
+  --driver-popover-title: var(--foreground);
+  --driver-popover-stage-bg: var(--background);
+  --driver-popover-border: var(--border);
+  --driver-popover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  background-color: var(--driver-popover-bg) !important;
+  color: var(--driver-popover-text) !important;
+  border: 1px solid var(--driver-popover-border) !important;
+  box-shadow: var(--driver-popover-shadow) !important;
+  border-radius: 16px !important;
+  padding: 32px !important;
+  max-width: 450px !important;
+}
+
+.app-tour-theme .driver-popover-title {
+  color: var(--driver-popover-title) !important;
+  font-weight: 700 !important;
+  font-size: 1.125rem !important;
+  margin-bottom: 12px !important;
+}
+
+.app-tour-theme .driver-popover-description {
+  color: var(--text-info) !important;
+  font-size: 0.875rem !important;
+  line-height: 1.6 !important;
+  margin-bottom: 20px !important;
+}
+
+.app-tour-theme .driver-popover-footer button {
+  background-color: var(--neutral) !important;
+  color: var(--foreground) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  padding: 6px 14px !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+  text-shadow: none !important;
+}
+
+.app-tour-theme .driver-popover-footer button:hover {
+  background-color: var(--border) !important;
+}
+
+.app-tour-theme .driver-popover-footer .driver-popover-next-btn {
+  background-color: var(--accent-1) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--accent-1) !important;
+}
+
+.app-tour-theme .driver-popover-footer .driver-popover-next-btn:hover {
+  opacity: 0.9 !important;
+}
+
+.app-tour-theme .driver-popover-progress-text {
+  color: var(--text-info) !important;
+  font-weight: 500 !important;
+}
+
+.app-tour-theme .driver-popover-close-btn {
+  color: var(--text-info) !important;
+}
+
+.app-tour-theme .driver-popover-close-btn:hover {
+  color: var(--foreground) !important;
+}

@@ -284,6 +284,7 @@ export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, select
                                 )}
                             </div>
                             <button
+                                id="tour-modal-generate"
                                 onClick={handleGenerate}
                                 disabled={selectedKeywords.length === 0 || isGenerating}
                                 className="flex items-center gap-2 px-6 py-2.5 bg-accent-1 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-all rounded-full text-sm font-bold shadow-lg active:scale-95"
@@ -308,6 +309,7 @@ export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, select
                                 Back
                             </button>
                             <button
+                                id="tour-modal-insert"
                                 onClick={handleInsert}
                                 disabled={!selectedId}
                                 className="flex items-center gap-2 px-8 py-2.5 bg-accent-1 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-all rounded-full text-sm font-bold shadow-lg active:scale-95"
@@ -335,11 +337,12 @@ export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, select
                             {isLoadingKeywords && <Loader2 size={14} className="text-accent-1" />}
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                            {normalizedKeywords.map((kw) => {
+                            {normalizedKeywords.map((kw, index) => {
                                 const isSelected = selectedKeywords.includes(kw);
                                 return (
                                     <button
                                         key={kw}
+                                        id={index === 0 ? "tour-keyword-chip" : undefined}
                                         onClick={() => toggleKeyword(kw)}
                                         className={cn(
                                             "flex items-center gap-2.5 p-3 rounded-xl border text-sm font-medium transition-all group",
@@ -362,9 +365,10 @@ export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, select
                     </div>
                 ) : (
                     <div className="flex flex-col gap-3">
-                        {generatedQuestions.map((q) => (
+                        {generatedQuestions.map((q, index) => (
                             <div
                                 key={q.id}
+                                id={index === 0 ? "tour-question-card" : undefined}
                                 onClick={() => setSelectedId(q.id)}
                                 className={cn(
                                     "cursor-pointer p-4 rounded-2xl border transition-all duration-200 flex flex-col gap-3 relative",

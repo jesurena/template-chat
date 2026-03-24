@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { useGoogle } from '@/hooks/auth/useGoogle';
 
@@ -72,11 +73,22 @@ export default function LoginClient() {
 
                     <div className="flex justify-between items-center text-[13px] text-gray-500 dark:text-gray-400 font-medium">
                         <span>Copyright © {new Date().getFullYear()} AppDev Central</span>
-                        <Link href="#" className="hover:text-foreground transition-colors">Privacy Policy</Link>
+                        <Link href="#" className="text-text hover:text-foreground transition-colors">Privacy Policy</Link>
                     </div>
                 </div>
 
-                <div className="hidden md:flex w-1/2 lg:w-[55%] bg-linear-to-br from-accent-1 to-primary relative overflow-hidden flex-col justify-center px-12 lg:px-24 text-white">
+                <div className="hidden md:flex w-1/2 lg:w-[55%] bg-primary relative overflow-hidden flex-col justify-center px-12 lg:px-24 text-white">
+                    <div className="absolute inset-0 z-0 overflow-hidden">
+                        <Image
+                            src="/bg.jpg"
+                            alt="Background"
+                            fill
+                            className="object-cover mix-blend-overlay"
+                            priority
+                        />
+                        <div className="absolute inset-0 bg-primary/95" />
+                    </div>
+
                     <div className="relative z-10 w-full max-w-xl">
                         <h2 className="text-[40px] lg:text-[46px] font-bold mb-6 leading-[1.15] tracking-tight">
                             Experience the power of intelligence.

@@ -8,6 +8,7 @@ import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useDrive } from '@/components/Providers/drive-provider';
 import { message } from '@/components/Providers/theme-provider';
+import { useTour } from '@/components/Providers/tour-provider';
 
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -52,6 +53,7 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
     const { theme, setTheme } = useTheme();
     const [activeTab, setActiveTab] = useState<'general' | 'connections'>('general');
     const { isDriveConnected, setisDriveConnected, setIsDriveModalOpen } = useDrive();
+    const { startTour } = useTour();
 
     return (
         <Modal
@@ -132,6 +134,23 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
                                 />
                                 <p className="text-xs text-foreground/50 mt-2">
                                     Select how you'd like the UI to appear on your screen.
+                                </p>
+                            </div>
+
+                            <div className="mt-2 pt-6 border-t border-border">
+                                <h4 className="text-sm font-medium text-foreground block mb-3">
+                                    Product Tour
+                                </h4>
+                                <Button 
+                                    onClick={() => {
+                                        onClose();
+                                        setTimeout(() => startTour(), 300);
+                                    }}
+                                >
+                                    Replay Tour
+                                </Button>
+                                <p className="text-xs text-foreground/50 mt-2">
+                                    Restart the interactive guide to learn about the app's features.
                                 </p>
                             </div>
                         </div>

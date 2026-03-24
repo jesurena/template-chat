@@ -3,6 +3,7 @@ import QueryProvider from "@/components/Providers/query-provider";
 import { ThemeProvider } from "@/components/Providers/theme-provider";
 import { DriveProvider } from "@/components/Providers/drive-provider";
 import { ChatProvider } from "@/components/Providers/chat-provider";
+import { TourProvider } from "@/components/Providers/tour-provider";
 
 export default function RootLayout({
   children,
@@ -16,7 +17,9 @@ export default function RootLayout({
           <QueryProvider>
             <DriveProvider>
               <ChatProvider>
-                {children}
+                <TourProvider>
+                  {children}
+                </TourProvider>
               </ChatProvider>
             </DriveProvider>
           </QueryProvider>

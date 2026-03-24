@@ -123,7 +123,7 @@ export default function Sidebar() {
     ];
 
     const sidebarContent = (
-        <div className="flex flex-col h-full bg-sidebar transition-colors duration-300">
+        <div id="tour-user-settings" className="flex flex-col h-full bg-sidebar transition-colors duration-300">
             <div className="p-4 flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                     <Dropdown menu={{ items: workspaceMenuItems }} trigger={['click']} placement="bottomLeft">
@@ -187,7 +187,7 @@ export default function Sidebar() {
                                             }
                                             const data = await loadChatMutation.mutateAsync(chat_id);
                                             loadChat(data.messages, data.chatId, data.sessionId);
-                                            
+
                                             router.push(`/chat/${chat_id}`);
                                             setIsOpen(false);
                                         } catch (error) {
@@ -213,7 +213,7 @@ export default function Sidebar() {
 
             <div className="p-5">
                 <Dropdown menu={{ items: userMenuItems }} placement="topRight" trigger={['click']}>
-                    <div className="flex items-center justify-between pt-4 border-t border-border cursor-pointer group">
+                    <div id="tour-user-profile" className="flex items-center justify-between pt-4 border-t border-border cursor-pointer group">
                         <div className="flex items-center gap-3 overflow-hidden">
                             {isLoading ? (
                                 <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center">
@@ -249,6 +249,7 @@ export default function Sidebar() {
             <header className="lg:hidden sticky top-0 left-0 w-full z-40 bg-background backdrop-blur-md border-b border-border px-4 h-16 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <button
+                        id="tour-mobile-menu"
                         onClick={() => setIsOpen(true)}
                         className="p-2 hover:bg-neutral rounded-lg transition-colors"
                     >
@@ -274,7 +275,7 @@ export default function Sidebar() {
             </div>
 
 
-            <aside className="hidden lg:flex w-64 flex-col h-screen border-r border-border sticky top-0 bg-sidebar">
+            <aside id="tour-chat-history" className="hidden lg:flex w-64 flex-col h-screen border-r border-border sticky top-0 bg-sidebar">
                 {sidebarContent}
             </aside>
 
@@ -295,7 +296,7 @@ export default function Sidebar() {
                         }
                         const data = await loadChatMutation.mutateAsync(chat_id);
                         loadChat(data.messages, data.chatId, data.sessionId);
-                        
+
                         router.push(`/chat/${chat_id}`);
                         setIsSearchModalOpen(false);
                         setIsOpen(false);

@@ -129,14 +129,14 @@ export function ChatInput({
     return (
         <div className="w-full bg-chat-bg transition-all duration-500 pb-2">
             <div className="max-w-4xl mx-auto px-4 relative flex flex-col items-center">
-                <div className={cn(
+                <div id="tour-ask-ai" className={cn(
                     "relative flex flex-col w-full bg-neutral border border-border rounded-[26px] p-2 focus-within:border-accent-1 focus-within:ring-1 focus-within:ring-accent-1/20 transition-all duration-500 ease-in-out shadow-sm",
                     isExpanded ? "min-h-[300px] rounded-[24px]" : "min-h-[64px]"
                 )}>
                     {/* Context and Expand Header */}
                     <div className="flex items-center justify-between w-full px-2 mb-1">
                         {selectedCompanies.length > 0 ? (
-                            <div className="flex flex-wrap gap-2 py-1 max-h-[90px] overflow-y-auto scrollbar-hide pr-2">
+                            <div id="tour-client-chips" className="flex flex-wrap gap-2 py-1 max-h-[90px] overflow-y-auto scrollbar-hide pr-2">
                                 {selectedCompanies.map(c => (
                                     <div key={c.company_name} className="flex items-center gap-1.5 bg-accent-1 text-white px-3 py-1.5 rounded-full text-[11px] font-bold shadow-sm transition-all hover:bg-accent-1/90">
                                         <span className="truncate max-w-[180px]">{c.company_name}</span>
@@ -187,6 +187,7 @@ export function ChatInput({
                                 rootClassName="custom-popover-root"
                             >
                                 <button
+                                    id="tour-add-context"
                                     className={cn(
                                         "p-2.5 rounded-full transition-colors mb-0.5 ml-0.5 shrink-0",
                                         isDriveConnected && !isTyping
