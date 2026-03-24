@@ -1,79 +1,139 @@
 # AppDev Central - AI Strategy Workspace
 
-AppDev Central is a high-performance, AI-driven workspace built with Next.js 15+, designed for project insights, strategy context selection, and interactive chat.
+A high-performance, AI-driven boilerplate application with a pre-built sidebar, immersive onboarding, strategy context selection, and authenticated chat. Designed to be a robust starting point for AI-integrated project management and strategic consulting tools.
 
-## 🚀 Tech Stack
+## Tech Stack
 
-- **Framework**: [Next.js](https://nextjs.org/) (App Router)
-- **Styling**: [Tailwind CSS 4.0](https://tailwindcss.com/)
-- **UI Components**: [Ant Design (AntD)](https://ant.design/)
-- **Icons**: [Lucide React](https://lucide.dev/)
-- **State Management & Fetching**: [TanStack React Query v5](https://tanstack.com/query/latest)
-- **Onboarding**: [Driver.js](https://driverjs.com/)
-- **Animations**: [Framer Motion](https://www.framer.com/motion/)
-- **Authentication**: [Google OAuth](https://github.com/MomenSherif/react-oauth)
-- **Effects**: [Canvas Confetti](https://github.com/catdad/canvas-confetti)
+| Technology | Version | Purpose |
+|---|---|---|
+| **Next.js** | 16.1.6 | React framework (App Router) |
+| **React** | 19.2.3 | UI library |
+| **TypeScript** | ^5 | Type safety |
+| **Tailwind CSS** | ^4 | Utility-first styling |
+| **Ant Design** | ^6.3.1 | UI component library (Modals, Dropdowns, Avatar) |
+| **TanStack React Query** | ^5 | Server state management & caching |
+| **Driver.js** | ^1.4.0 | Interactive Onboarding Tour |
+| **Lucide React** | ^0.577 | Icon library |
+| **Framer Motion** | ^12 | Animations |
+| **Axios** | ^1 | HTTP client |
+| **Canvas Confetti** | ^1.9 | Celebration effects |
 
----
+## Getting Started
 
-## 🏗️ Provider System & Architecture
+### 1. Install dependencies
 
-The application relies on several specialized context providers located in `components/Providers/` to manage global state and functionality.
+```bash
+npm install
+```
 
-### 1. `TourProvider` (`tour-provider.tsx`)
-- **Use Case**: Manages the interactive onboarding flow using **Driver.js**.
-- **Functionality**:
-  - Automatically triggers the welcome modal for first-time authenticated users.
-  - Handles the step-by-step tour flow across desktop and mobile (with responsive targeting).
-  - Triggers celebratory confetti upon tour completion and sets persistence in `localStorage`.
+### 2. Set up environment variables
 
-### 2. `ChatProvider` (`chat-provider.tsx`)
-- **Use Case**: Centralized state management for chat interactions.
-- **Functionality**:
-  - Manages message history, streaming responses from the AI, and typing indicators.
-  - Handles the logic for sending messages and stopping current streams.
+```bash
+cp .env.example .env.local
+```
 
-### 3. `DriveProvider` (`drive-provider.tsx`)
-- **Use Case**: Manages Google Drive integration.
-- **Functionality**:
-  - Handles the connection state to Google Drive.
-  - Facilitates file listing and selection from the user's Google Drive to provide additional context to the AI.
+Edit `.env.local` and set your Google OAuth Client ID and Backend API URL.
 
-### 4. `ThemeProvider` (`theme-provider.tsx`)
-- **Use Case**: Dark/Light mode and general UI styling.
-- **Functionality**:
-  - Toggles between light and dark themes based on user preference.
-  - Injects consistent styling variables used across the vanilla Tailwind and AntD components.
+### 3. Run the development server
 
-### 5. `QueryProvider` (`query-provider.tsx`)
-- **Use Case**: Global configuration for **TanStack React Query**.
-- **Functionality**:
-  - Initializes the `QueryClient` and provides it to the entire application for caching, prefetching, and state management of API requests.
+```bash
+npm run dev
+```
 
----
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## 🛠️ Key Directories
+## NPM Scripts
 
-- `/app`: Next.js App Router pages and layouts.
-- `/components/Providers`: All global context providers mentioned above.
-- `/hooks`: Custom React hooks for auth, chat, and utility functions.
-- `/interface`: TypeScript interfaces for consistent data typing across the app.
-- `/public`: Static assets including backgrounds and icons.
+| Script | Command | Description |
+|---|---|---|
+| `dev` | `npm run dev` | Start the Next.js development server |
+| `build` | `npm run build` | Build the production bundle |
+| `start` | `npm run start` | Start the production server |
+| `lint` | `npm run lint` | Run ESLint |
 
-## 🏃 Getting Started
+## Project Structure
 
-1. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+```
+template-chat/
+├── app/                        # Next.js App Router
+│   ├── globals.css             # Global styles & CSS theme variables
+│   ├── layout.tsx              # Root layout (providers)
+│   ├── page.tsx                # Landing/Auth redirect
+│   ├── login/                  # Login page with background blending
+│   └── chat/                   # Main AI Chat interface
+│       ├── components/         # Chat-specific components
+│       └── [chatId]/           # Dynamic chat session routes
+├── components/                 # Shared components
+│   ├── Sidebars/               # Main sidebar with mobile burger menu
+│   ├── Providers/              # App providers (Auth, Tour, Theme, Query)
+│   └── Settings/               # Global settings modal
+├── hooks/                      # Custom React hooks
+│   ├── auth/                   # Google OAuth hooks
+│   └── chat/                   # Chat history & streaming hooks
+├── interface/                  # TypeScript interfaces (User, Chat, Company)
+├── lib/                        # Core utilities
+│   └── api.ts                  # Axios instance with global interceptors
+├── utils/                      # Helper functions (cn, style, chat)
+└── public/                     # Static assets (bg.jpg, icons)
+```
 
-2. **Set up Environment Variables**:
-   Create a `.env.local` file with your Google Client IDs and API base URLs.
+## Core Infrastructure
 
-3. **Run the development server**:
-   ```bash
-   npm run dev
-   ```
+### 1. Tour Provider (`components/Providers/tour-provider.tsx`)
+- **Purpose**: Manages the interactive **Driver.js** onboarding tour.
+- **Features**: Automatically triggers for first-time authenticated users, supports responsive targeting (burger menu on mobile), and plays completion confetti.
 
-4. **Open the app**:
-   Navigate to [http://localhost:3000](http://localhost:3000) to see the result.
+### 2. API Interceptor (`lib/api.ts`)
+The project includes a pre-configured Axios instance (`api.ts`). It acts as a global **interceptor** to:
+- Automatically route requests to your configured API base URL.
+- Intercept outgoing requests to attach Authentication headers.
+- Handle global API errors and response mapping.
+
+### 3. Chat Provider (`components/Providers/chat-provider.tsx`)
+- **Purpose**: Centralized state management for the AI chat interface.
+- **Features**: Manages message history, real-time response streaming, and typing indicators.
+
+### 4. Drive Provider (`components/Providers/drive-provider.tsx`)
+- **Purpose**: Manages Google Drive integration for context selection.
+- **Features**: Connection state management and file/context discovery for the AI.
+
+### 5. Theme Provider (`components/Providers/theme-provider.tsx`)
+- **Purpose**: Manages Light/Dark mode state and persistence.
+- **Logic**: Persists preference to `localStorage` and applies the `dark` class to the root HTML element.
+
+## Theming
+
+The app supports **light** and **dark** mode via CSS custom properties in `globals.css`.
+
+### CSS Variables
+
+| Variable | Light | Dark | Tailwind Class | Usage |
+|---|---|---|---|---|
+| `--background` | `#FFFFFF` | `#141414` | `bg-background` | Page backgrounds |
+| `--foreground` | `#111827` | `#ffffff` | `text-foreground` | Default text |
+| `--text` | `#111111` | `#ffffff` | `text-text` | Primary headings |
+| `--text-info` | `#616161` | `#a1a1aa` | `text-text-info` | Muted descriptions |
+| `--primary` | `#0F2A44` | `#1e293b` | `bg-primary` | Main brand color |
+| `--accent-1` | `#1677ff` | `#3b82f6` | `bg-accent-1` | Primary actions/links |
+| `--accent-2` | `#FF8A3D` | `#f97316` | `bg-accent-2` | Secondary highlights |
+| `--border` | `#d9dadb` | `#27272a` | `border-border` | Dividers & borders |
+| `--chat-bg` | `#eaeaea` | `#212121` | `bg-chat-bg` | Chat bubble area |
+
+## Strategy Context Engine
+
+The core value of this template is the **Strategy Context Engine**, which leverages AI processing via the configured backend.
+
+1. **Client Selection**: Users select client/company context items. The metadata is stored in-session to ground upcoming prompts.
+2. **Keyword Generation**: AI generates industry-specific keywords based on selected context by calling the `NEXT_PUBLIC_API_URL` endpoints.
+3. **Question Framing**: The engine suggests tailored business questions to kickstart strategic analysis.
+4. **Knowledge Retrieval**: The AI uses **Google Drive Integration** (configured via `NEXT_PUBLIC_GOOGLE_CLIENT_ID`) and Company data to ground its answers using your specific documents/files.
+
+### Connecting to a Backend
+
+This template requires a running backend (configured in `.env`) to process AI requests:
+- **`NEXT_PUBLIC_API_URL`**: Point this to your AI API (e.g., `http://192.168.15.238:5000/api/`).
+- **`NEXT_PUBLIC_GOOGLE_CLIENT_ID`**: Required for Google Drive context and authenticated user sessions.
+
+## License
+
+Private — AppDev Internal Use only.
