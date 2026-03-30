@@ -6,9 +6,11 @@ import Image from 'next/image';
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { useGoogle } from '@/hooks/auth/useGoogle';
 import { useTheme } from '@/components/Providers/theme-provider';
+import PrivacyModal from './PrivacyModal';
 
 export default function LoginClient() {
     const [isClient, setIsClient] = useState(false);
+    const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
     const { login, isLoginPending, isLoginError, loginData } = useGoogle();
     const { isDark } = useTheme();
 
@@ -75,7 +77,16 @@ export default function LoginClient() {
 
                     <div className="flex justify-between items-center text-[13px] text-gray-500 dark:text-gray-400 font-medium">
                         <span>Copyright © {new Date().getFullYear()} AppDev Central</span>
-                        <Link href="#" className="text-text hover:text-foreground transition-colors">Privacy Policy</Link>
+                        <Link 
+                            href="#" 
+                            onClick={(e) => {
+                                e.preventDefault();
+                                setIsPrivacyModalOpen(true);
+                            }}
+                            className="text-text hover:text-foreground transition-colors"
+                        >
+                            Privacy Policy
+                        </Link>
                     </div>
                 </div>
 
@@ -101,6 +112,11 @@ export default function LoginClient() {
                     </div>
                 </div>
             </div>
+
+            <PrivacyModal 
+                visible={isPrivacyModalOpen}
+                onClose={() => setIsPrivacyModalOpen(false)}
+            />
         </GoogleOAuthProvider>
     );
 }
