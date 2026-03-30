@@ -72,23 +72,23 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
             mask={false}
             centered
         >
-            <div className="flex h-[520px] relative">
+            <div className="flex flex-col md:flex-row h-[75vh] md:h-[520px] relative">
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 p-2 rounded-full text-foreground/50 hover:text-foreground hover:bg-foreground/5 transition-all z-10"
                 >
                     <X size={20} />
                 </button>
-                <div className="w-[220px] bg-neutral border-r border-border flex flex-col shrink-0">
-                    <div className="px-5 pt-6 pb-4">
+                <div className="w-full md:w-[220px] bg-neutral border-b md:border-b-0 md:border-r border-border flex flex-col shrink-0">
+                    <div className="px-4 md:px-5 pt-5 md:pt-6 pb-2 md:pb-4 pr-12">
                         <h2 className="text-base font-bold text-foreground tracking-tight">Settings</h2>
                     </div>
 
-                    <nav className="flex flex-col gap-1 px-3 flex-1">
+                    <nav className="flex flex-row md:flex-col gap-1 md:gap-1 px-3 pb-3 md:pb-0 md:flex-1 overflow-x-auto scrollbar-hide">
                         <button
                             onClick={() => setActiveTab('general')}
                             className={cn(
-                                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer",
+                                "flex items-center gap-2 md:gap-3 px-3 py-2 md:py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer shrink-0 whitespace-nowrap",
                                 activeTab === 'general'
                                     ? "bg-accent-1 text-white shadow-sm"
                                     : "text-foreground hover:bg-black/5 dark:hover:bg-white/5"
@@ -100,7 +100,7 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
                         <button
                             onClick={() => setActiveTab('connections')}
                             className={cn(
-                                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer",
+                                "flex items-center gap-2 md:gap-3 px-3 py-2 md:py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer shrink-0 whitespace-nowrap",
                                 activeTab === 'connections'
                                     ? "bg-accent-1 text-white shadow-sm"
                                     : "text-foreground hover:bg-black/5 dark:hover:bg-white/5"
@@ -112,7 +112,7 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
                     </nav>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-8">
+                <div className="flex-1 overflow-y-auto p-5 md:p-8">
                     {activeTab === 'general' && (
                         <div className="flex flex-col gap-6 animate-in fade-in duration-300">
                             <div>
@@ -165,29 +165,30 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
                                 </p>
                             </div>
 
-                            <div className="flex items-center justify-between p-4 rounded-xl border border-border bg-neutral/50">
-                                <div className="flex items-center gap-4">
+                            <div className="flex flex-col xl:flex-row items-stretch xl:items-center justify-between p-4 rounded-xl border border-border bg-neutral/50 gap-4">
+                                <div className="flex items-center gap-3 md:gap-4 min-w-0 flex-1">
                                     <img
                                         src="/gdrive.svg"
                                         alt="Google Drive"
-                                        className={cn("w-10 h-10 transition-all", !isDriveConnected && "grayscale opacity-50")}
+                                        className={cn("w-10 h-10 shrink-0 transition-all", !isDriveConnected && "grayscale opacity-50")}
                                     />
-                                    <div className="flex flex-col">
-                                        <div className="flex items-center gap-2">
-                                            <span className="font-semibold text-foreground">Google Drive</span>
+                                    <div className="flex flex-col min-w-0">
+                                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                                            <span className="font-semibold text-foreground truncate">Google Drive</span>
                                             {isDriveConnected && (
-                                                <span className="flex items-center gap-1 text-xs font-bold text-green-600">
+                                                <span className="flex items-center gap-1 text-xs font-bold text-green-600 whitespace-nowrap">
                                                     <CheckCircle2 size={11} />
                                                     Connected
                                                 </span>
                                             )}
                                         </div>
-                                        <span className="text-sm text-gray-500">
+                                        <span className="text-sm text-gray-500 truncate">
                                             Sync documents and client context
                                         </span>
                                     </div>
                                 </div>
                                 <Button
+                                    className="w-full xl:w-auto"
                                     onClick={() => {
                                         if (isDriveConnected) {
                                             message.error('This function is not yet implemented.');
