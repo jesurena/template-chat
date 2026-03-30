@@ -5,10 +5,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { useGoogle } from '@/hooks/auth/useGoogle';
+import { useTheme } from '@/components/Providers/theme-provider';
 
 export default function LoginClient() {
     const [isClient, setIsClient] = useState(false);
     const { login, isLoginPending, isLoginError, loginData } = useGoogle();
+    const { isDark } = useTheme();
 
     useEffect(() => {
         setIsClient(true);
@@ -63,7 +65,7 @@ export default function LoginClient() {
                             <GoogleLogin
                                 onSuccess={handleSuccess}
                                 onError={handleError}
-                                theme="filled_blue"
+                                theme={isDark ? "filled_black" : "filled_blue"}
                                 size="large"
                                 shape="rectangular"
                                 width="380"

@@ -10,7 +10,21 @@ const api = axios.create({
     },
 });
 
-// Global response interceptor for notifications
+api.interceptors.request.use(
+    (config) => {
+        if (typeof window !== 'undefined') {
+            const token = localStorage.getItem('jwt_token');
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`;
+            }
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
 api.interceptors.response.use(
     (response) => {
         const method = response.config.method?.toUpperCase();

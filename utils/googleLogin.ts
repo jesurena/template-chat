@@ -20,9 +20,8 @@ export const handleLoginSuccess = (data: any) => {
 };
 
 export const handleLogout = () => {
-    localStorage.clear();
-    
-    // Redirect to login or home
+    const keysToRemove = ["jwt_token", "user_id", "uName", "uEmail", "AoId", "isFirstTime"];
+    keysToRemove.forEach(key => localStorage.removeItem(key));
     const loginUrl = "/login";
     window.location.replace(loginUrl);
 };

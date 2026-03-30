@@ -13,8 +13,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        <ThemeProvider>
-          <QueryProvider>
+        <QueryProvider>
+          <ThemeProvider>
             <DriveProvider>
               <ChatProvider>
                 <TourProvider>
@@ -22,8 +22,8 @@ export default function RootLayout({
                 </TourProvider>
               </ChatProvider>
             </DriveProvider>
-          </QueryProvider>
-        </ThemeProvider>
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );

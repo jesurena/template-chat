@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { handleLoginSuccess, handleLogout } from '@/utils/googleLogin';
 
@@ -32,4 +32,48 @@ export const useGoogle = () => {
         isLoginError: loginMutation.isError,
         loginData: loginMutation.data,
     };
+};
+
+export const useFetchProfile = () => {
+    return useQuery({
+        queryKey: ['auth', 'me'],
+        queryFn: async () => {
+            // Prevent attempting to fetch if not logged in
+            if (typeof window !== 'undefined') {
+                const token = localStorage.getItem('jwt_token');
+                if (!token) return null;
+            }
+
+            const { data } = await api.get('/auth/me');
+            return data;
+        },
+    });
+};
+
+export const useUpdateTheme = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (theme: 'light' | 'dark' | 'system') => {
+            const { data } = await api.put('/auth/theme', { theme });
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
+        },
+    });
+};
+
+export const useUpdateFirstTime = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (isFirstTime: boolean) => {
+            const { data } = await api.put('/auth/first_time', { isFirstTime });
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
+        },
+    });
 };

@@ -6,6 +6,7 @@ import 'driver.js/dist/driver.css';
 import { Modal } from 'antd';
 import confetti from 'canvas-confetti';
 import { MessageSquare, Sparkles, Shield, PartyPopper, ArrowRight, Check } from 'lucide-react';
+import { useFetchProfile, useUpdateFirstTime } from '@/hooks/auth/useGoogle';
 
 interface TourContextType {
     startTour: () => void;
@@ -52,14 +53,18 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
     const [isClient, setIsClient] = useState(false);
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [showCongrats, setShowCongrats] = useState(false);
+    const { data: profile } = useFetchProfile();
+    const { mutate: updateFirstTime } = useUpdateFirstTime();
 
     useEffect(() => {
         setIsClient(true);
-        const token = localStorage.getItem('jwt_token');
-        if (token) {
+    }, []);
+
+    useEffect(() => {
+        if (profile?.isFirstTime) {
             setShowOnboarding(true);
         }
-    }, []);
+    }, [profile]);
 
     const startTour = () => {
         setShowOnboarding(false);
@@ -73,6 +78,9 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
             onDestroyed: () => {
                 fireConfetti();
                 setShowCongrats(true);
+                if (profile?.isFirstTime) {
+                    updateFirstTime(false);
+                }
             },
             steps: [
                 {
@@ -158,7 +166,10 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
 
     const skipTour = () => {
         setShowOnboarding(false);
-        localStorage.setItem('hasSeenTour', 'true');
+        localStorage.setItem('isFirstTime', 'true');
+        if (profile?.isFirstTime) {
+            updateFirstTime(false);
+        }
     };
 
     const features = [

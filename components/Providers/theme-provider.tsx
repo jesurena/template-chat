@@ -31,6 +31,7 @@ export type Theme = 'light' | 'dark' | 'system';
 
 interface ThemeContextType {
     theme: Theme;
+    isDark: boolean;
     setTheme: (theme: Theme) => void;
 }
 
@@ -96,7 +97,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <ThemeContext.Provider value={{ theme, setTheme }}>
+        <ThemeContext.Provider value={{ theme, isDark, setTheme }}>
             <ConfigProvider
                 theme={{
                     algorithm: isDark
