@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { LayoutGrid, Sparkles, Box, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -17,14 +17,6 @@ export interface QuickQuestion {
     prompt: string;
 }
 
-const defaultQuestions: QuickQuestion[] = [
-    { label: 'Theme Colors', prompt: 'What is the color palette for AppDev Central?' },
-    { label: 'Naming Rules', prompt: 'What are the naming conventions for components and hooks?' },
-    { label: 'Directory Rules', prompt: 'Explain the directory structure for this project' },
-    { label: 'Ant Design', prompt: 'How do we use Ant Design components here?' },
-    { label: 'TanStack Query', prompt: 'What is the standard for data fetching?' },
-    { label: 'StatusChip', prompt: 'How do I implement the StatusChip component?' }
-];
 
 export function QuickQuestions({
     onQuestionClick,

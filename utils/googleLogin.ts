@@ -1,4 +1,4 @@
-export const handleLoginSuccess = (data: any) => {
+export const handleLoginSuccess = (data: { token: string; user: { id?: string; name?: string; email?: string } }) => {
     const { token: jwtToken, user } = data;
 
     localStorage.setItem("jwt_token", jwtToken);

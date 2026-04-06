@@ -77,10 +77,12 @@ export const streamChatResponse = async (
         const [text, metricsPart] = finalText.split(marker);
         finalText = text;
         try {
-            const metrics = JSON.parse(metricsPart);
+            JSON.parse(metricsPart);
             // Example of where you might store/use metrics
-            // console.log("Received LLM Metrics:", metrics);
-        } catch(e) {}
+            // console.log("Received LLM Metrics:");
+        } catch {
+            // ignore
+        }
     }
     
     return finalText;

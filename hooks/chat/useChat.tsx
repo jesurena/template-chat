@@ -1,14 +1,14 @@
 'use client';
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import api from '@/lib/api';
-import { ChatThread, ChatMessage, Company } from '@/interface/Chat';
+import { ChatMessage, ChatHistoryItem } from '@/interface/Chat';
 import { streamChatResponse } from '@/utils/chat';
 
 export { useChat } from '@/components/Providers/chat-provider';
 
 export const useChatHistory = (accountId: string | null) => {
-    return useQuery<any[]>({
+    return useQuery<ChatHistoryItem[]>({
         queryKey: ['chat-history', accountId],
         queryFn: async () => {
             if (!accountId) return [];
@@ -25,7 +25,7 @@ export const useLoadChatHistory = () => {
             const accountId = localStorage.getItem("AoId");
             const { data } = await api.get(`/chat_history/${chatId}?accountId=${accountId}`);
 
-            const messages = (data.messages || []).map((m: any) => ({
+            const messages = (data.messages || []).map((m: { role?: string; content?: string; message?: string }) => ({
                 role: m.role || 'assistant',
                 content: m.content || m.message || '',
             }));
@@ -42,10 +42,8 @@ export const useLoadChatHistory = () => {
 export const useStreamMessage = (
     onChunk: (text: string) => void,
     onComplete: (text: string) => void,
-    onError: (err: any) => void
+    onError: (err: unknown) => void
 ) => {
-    const queryClient = useQueryClient();
-
     const streamUrl = `${process.env.NEXT_PUBLIC_API_URL}chat_stream`;
 
     return useMutation({
@@ -79,7 +77,7 @@ export const useStreamMessage = (
 
 export const useGenerateKeywords = () => {
     return useMutation({
-        mutationFn: async (companiesPayload: any[]) => {
+        mutationFn: async (companiesPayload: Record<string, unknown>[]) => {
             const { data } = await api.post('/generate_keywords_from_company', {
                 companies: companiesPayload
             });
@@ -90,7 +88,7 @@ export const useGenerateKeywords = () => {
 
 export const useGenerateQuestions = () => {
     return useMutation({
-        mutationFn: async ({ keywords, companiesPayload }: { keywords: string[]; companiesPayload: any[] }) => {
+        mutationFn: async ({ keywords, companiesPayload }: { keywords: string[]; companiesPayload: Record<string, unknown>[] }) => {
             const { data } = await api.post('/generate_questions', {
                 company: companiesPayload[0],
                 keywords: keywords

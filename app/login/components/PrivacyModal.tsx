@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Modal } from 'antd';
-import { X, Shield } from 'lucide-react';
 
 interface PrivacyModalProps {
     visible: boolean;

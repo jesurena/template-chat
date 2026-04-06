@@ -9,8 +9,11 @@ export default function Home() {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
     useEffect(() => {
-        const token = localStorage.getItem('jwt_token');
-        setIsAuthenticated(!!token);
+        const timer = setTimeout(() => {
+            const token = localStorage.getItem('jwt_token');
+            setIsAuthenticated(!!token);
+        }, 0);
+        return () => clearTimeout(timer);
     }, []);
 
     if (isAuthenticated === null) {

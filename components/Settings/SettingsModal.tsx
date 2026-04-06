@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Button, Modal, Select } from 'antd';
 import { useTheme } from '@/components/Providers/theme-provider';
 import { Settings, Sun, Moon, Monitor, X, Link as LinkIcon, CheckCircle2 } from 'lucide-react';
+import Image from 'next/image';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useDrive } from '@/components/Providers/drive-provider';
@@ -52,7 +53,7 @@ const themeOptions = [
 export default function SettingsModal({ visible, onClose }: SettingsModalProps) {
     const { theme, setTheme } = useTheme();
     const [activeTab, setActiveTab] = useState<'general' | 'connections'>('general');
-    const { isDriveConnected, setisDriveConnected, setIsDriveModalOpen } = useDrive();
+    const { isDriveConnected, setisDriveConnected } = useDrive();
     const { startTour } = useTour();
 
     return (
@@ -133,7 +134,7 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
                                     className="w-full sm:w-64"
                                 />
                                 <p className="text-xs text-foreground/50 mt-2">
-                                    Select how you'd like the UI to appear on your screen.
+                                    Select how you&apos;d like the UI to appear on your screen.
                                 </p>
                             </div>
 
@@ -150,7 +151,7 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
                                     Replay Tour
                                 </Button>
                                 <p className="text-xs text-foreground/50 mt-2">
-                                    Restart the interactive guide to learn about the app's features.
+                                    Restart the interactive guide to learn about the app&apos;s features.
                                 </p>
                             </div>
                         </div>
@@ -167,9 +168,11 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
 
                             <div className="flex flex-col xl:flex-row items-stretch xl:items-center justify-between p-4 rounded-xl border border-border bg-neutral/50 gap-4">
                                 <div className="flex items-center gap-3 md:gap-4 min-w-0 flex-1">
-                                    <img
+                                    <Image
                                         src="/gdrive.svg"
                                         alt="Google Drive"
+                                        width={40}
+                                        height={40}
                                         className={cn("w-10 h-10 shrink-0 transition-all", !isDriveConnected && "grayscale opacity-50")}
                                     />
                                     <div className="flex flex-col min-w-0">

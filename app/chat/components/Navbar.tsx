@@ -2,8 +2,9 @@
 
 import React from 'react';
 import { ExportOutlined } from '@ant-design/icons';
-import { Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
+import { Dropdown } from 'antd';
+import Image from 'next/image';
 import { cn } from '@/utils/cn';
 
 interface NavbarProps {
@@ -63,7 +64,7 @@ export function Navbar({
                         "flex items-center justify-center w-8 h-8 mr-1.5 rounded-full transition-all",
                         !isDriveConnected && "opacity-60 grayscale bg-neutral-200"
                     )}>
-                        <img src="/gdrive.svg" className="w-5 h-5" alt="GDrive" />
+                        <Image src="/gdrive.svg" className="w-5 h-5" alt="GDrive" width={20} height={20} />
                     </div>
                     <span className="text-[14px] font-semibold text-foreground/80">
                         {isDriveConnected ? "Connected" : "Connect GDrive"}

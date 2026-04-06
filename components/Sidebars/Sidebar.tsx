@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Settings, MoreVertical, Menu, X, LogOut, Loader2, Plus, Search, ChevronDown, UserCog, MessageSquare } from 'lucide-react';
+import { Settings, MoreVertical, Menu, LogOut, Loader2, Plus, Search, ChevronDown, UserCog, MessageSquare } from 'lucide-react';
 import { Dropdown, Avatar } from 'antd';
 import type { MenuProps } from 'antd';
 import { clsx, type ClassValue } from 'clsx';
@@ -14,6 +13,7 @@ import SearchChatsModal from './SearchChatsModal';
 import { useChat, useChatHistory, useLoadChatHistory } from '@/hooks/chat/useChat';
 import { useGoogle } from '@/hooks/auth/useGoogle';
 import { User } from '@/interface/User';
+import { ChatHistoryItem } from '@/interface/Chat';
 
 const useLocalAuth = () => {
     const [user, setUser] = useState<User | null>(null);
@@ -287,7 +287,7 @@ export default function Sidebar() {
             <SearchChatsModal
                 open={isSearchModalOpen}
                 onClose={() => setIsSearchModalOpen(false)}
-                onSelectChat={async (chat: any) => {
+                onSelectChat={async (chat: ChatHistoryItem) => {
                     try {
                         const chat_id = chat.chat_id || chat.id || chat.ThreadID;
                         if (!chat_id) {

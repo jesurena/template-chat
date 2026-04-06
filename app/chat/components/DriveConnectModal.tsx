@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+
 import React, { useState } from 'react';
 import { Modal } from 'antd';
 import { useDrive } from '@/components/Providers/drive-provider';
@@ -25,10 +27,12 @@ export function DriveConnectModal({ onDisconnect }: DriveConnectModalProps) {
                 body: 'custom-modal-body p-4 pt-8 text-center'
             }}
         >
-            <img
+            <Image
                 src="/gdrive.svg"
                 alt="Google Drive"
-                className={`w-16 h-16 mx-auto mb-5 transition-all duration-300 ${!isDriveConnected ? "opacity-40 grayscale" : ""}`}
+                width={64}
+                height={64}
+                className={`mx-auto mb-5 transition-all duration-300 ${!isDriveConnected ? "opacity-40 grayscale" : ""}`}
             />
 
             {isDriveConnected ? (
@@ -50,7 +54,7 @@ export function DriveConnectModal({ onDisconnect }: DriveConnectModalProps) {
                                         key={file.id}
                                         className="flex items-center gap-2 px-3 py-1.5 bg-neutral/40 border border-border rounded-lg text-[11px] font-medium text-foreground/70 hover:border-accent-1/30 hover:bg-neutral transition-all cursor-default group"
                                     >
-                                        <img src="/gdrive.svg" alt="" className="w-3 h-3 grayscale group-hover:grayscale-0 transition-all" />
+                                        <Image src="/gdrive.svg" alt="" width={12} height={12} className="grayscale group-hover:grayscale-0 transition-all" />
                                         <span className="truncate max-w-[120px]">{file.name}</span>
                                     </div>
                                 ))}
@@ -81,6 +85,7 @@ export function DriveConnectModal({ onDisconnect }: DriveConnectModalProps) {
                             onClick={() => {
                                 message.error('This function is not yet implemented.');
                                 setIsDriveModalOpen(false);
+                                onDisconnect();
                             }}
                             className="text-gray-500 hover:text-red-500 font-medium transition-colors text-sm"
                         >

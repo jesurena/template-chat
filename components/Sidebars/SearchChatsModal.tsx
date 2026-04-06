@@ -4,11 +4,12 @@ import React, { useState } from 'react';
 import { Modal, Input } from 'antd';
 import { Search, History, MessageSquare, Loader2 } from 'lucide-react';
 import { useChatHistory } from '@/hooks/chat/useChat';
+import { ChatHistoryItem } from '@/interface/Chat';
 
 interface SearchChatsModalProps {
     open: boolean;
     onClose: () => void;
-    onSelectChat: (chat: any) => void;
+    onSelectChat: (chat: ChatHistoryItem) => void;
 }
 
 export default function SearchChatsModal({ open, onClose, onSelectChat }: SearchChatsModalProps) {
@@ -16,11 +17,11 @@ export default function SearchChatsModal({ open, onClose, onSelectChat }: Search
     const accountId = typeof window !== 'undefined' ? localStorage.getItem("AoId") : null;
     const { data: chatHistory = [], isLoading } = useChatHistory(accountId);
 
-    const filteredChats = chatHistory.filter((c: any) =>
+    const filteredChats = chatHistory.filter((c: ChatHistoryItem) =>
         c.content?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const handleSelectChat = (chat: any) => {
+    const handleSelectChat = (chat: ChatHistoryItem) => {
         onSelectChat(chat);
         setSearchQuery('');
     };
@@ -61,7 +62,7 @@ export default function SearchChatsModal({ open, onClose, onSelectChat }: Search
                     </div>
                 ) : filteredChats.length > 0 ? (
                     <div className="flex flex-col gap-1">
-                        {filteredChats.map((chat: any) => (
+                        {filteredChats.map((chat: ChatHistoryItem) => (
                             <button
                                 key={chat.chat_id}
                                 onClick={() => handleSelectChat(chat)}
@@ -86,7 +87,7 @@ export default function SearchChatsModal({ open, onClose, onSelectChat }: Search
                 ) : (
                     <div className="py-12 flex flex-col items-center justify-center text-gray-400">
                         <Search size={32} className="mb-3 opacity-20" />
-                        <p className="text-sm">No chats found for "{searchQuery}"</p>
+                        <p className="text-sm">No chats found for &quot;{searchQuery}&quot;</p>
                     </div>
                 )}
             </div>

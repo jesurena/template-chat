@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import { useGoogle } from '@/hooks/auth/useGoogle';
 import { useTheme } from '@/components/Providers/theme-provider';
 import PrivacyModal from './PrivacyModal';
@@ -11,24 +11,28 @@ import PrivacyModal from './PrivacyModal';
 export default function LoginClient() {
     const [isClient, setIsClient] = useState(false);
     const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
-    const { login, isLoginPending, isLoginError, loginData } = useGoogle();
+    const { login } = useGoogle();
     const { isDark } = useTheme();
 
     useEffect(() => {
-        setIsClient(true);
-        if (window.location.hostname === "ics-ai") {
-            const redirectUrl = process.env.NEXT_PUBLIC_ICS_LOGIN_URL || "http://localhost:3000/login?from=ics";
-            window.location.replace(redirectUrl);
-        }
+        const timer = setTimeout(() => {
+            setIsClient(true);
+            if (window.location.hostname === "ics-ai") {
+                const redirectUrl = process.env.NEXT_PUBLIC_ICS_LOGIN_URL || "http://localhost:3000/login?from=ics";
+                window.location.replace(redirectUrl);
+            }
+        }, 0);
+        return () => clearTimeout(timer);
     }, []);
 
-    const handleSuccess = async (credentialResponse: any) => {
+    const handleSuccess = async (credentialResponse: CredentialResponse) => {
         try {
             const result = await login(credentialResponse);
             console.log("Logged in:", result);
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Login failed:", err);
-            alert(err.response?.data?.error || "Login failed");
+            const errorResponse = err as { response?: { data?: { error?: string } } };
+            alert(errorResponse?.response?.data?.error || "Login failed");
         }
     };
 

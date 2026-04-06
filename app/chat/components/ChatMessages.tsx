@@ -34,7 +34,7 @@ export function ChatMessages({ messages, isTyping, streamingText }: ChatMessages
         if (!mounted || !timestamp) return "";
         try {
             return new Date(timestamp).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-        } catch (e) {
+        } catch {
             return "";
         }
     };

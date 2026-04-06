@@ -50,19 +50,15 @@ const fireConfetti = () => {
 };
 
 export function TourProvider({ children }: { children: React.ReactNode }) {
-    const [isClient, setIsClient] = useState(false);
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [showCongrats, setShowCongrats] = useState(false);
     const { data: profile } = useFetchProfile();
     const { mutate: updateFirstTime } = useUpdateFirstTime();
 
     useEffect(() => {
-        setIsClient(true);
-    }, []);
-
-    useEffect(() => {
         if (profile?.isFirstTime) {
-            setShowOnboarding(true);
+            const timer = setTimeout(() => setShowOnboarding(true), 0);
+            return () => clearTimeout(timer);
         }
     }, [profile]);
 
@@ -92,7 +88,8 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
                             : 'Access all your previous conversations quickly and manage your history from here.',
                         side: isMobile ? 'bottom' : 'right',
                         align: 'start'
-                    } as any
+                    }
+
                 },
                 {
                     element: isMobile ? '#tour-mobile-menu' : '#tour-chat-history #tour-user-profile',
@@ -101,7 +98,8 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
                         description: 'Click here to switch between Dark/Light modes, manage your connections, or redo this tutorial anytime.',
                         side: isMobile ? 'bottom' : 'right',
                         align: 'start'
-                    } as any
+                    }
+
                 },
                 {
                     element: '#tour-select-context',
@@ -120,7 +118,8 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
                                 driverObj.moveNext();
                             }
                         }
-                    } as any
+                    }
+
                 },
                 {
                     element: '#tour-generate-questions',
@@ -129,7 +128,8 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
                         description: 'Once a client is selected, use this to frame specific strategy questions based on industry keywords.',
                         side: 'top',
                         align: 'center'
-                    } as any
+                    }
+
                 },
                 {
                     element: '#tour-client-chips',
@@ -138,7 +138,8 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
                         description: 'Your selected clients appear here. The AI uses this context for its response.',
                         side: 'top',
                         align: 'center'
-                    } as any
+                    }
+
                 },
                 {
                     element: '#tour-add-context',
@@ -147,7 +148,8 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
                         description: 'Need more data? Use the plus button to add more clients or generate specialized strategy questions for your current conversation.',
                         side: 'top',
                         align: 'center'
-                    } as any
+                    }
+
                 },
                 {
                     element: '#tour-ask-ai',
@@ -156,9 +158,10 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
                         description: 'You\'re ready to go! Ask the AI anything about your project standards or client context.',
                         side: 'top',
                         align: 'center'
-                    } as any
+                    }
                 }
-            ] as any
+            ]
+
         });
 
         driverObj.drive();
@@ -261,7 +264,7 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
                         <div className="w-8 h-8 rounded-full bg-accent-1/10 flex items-center justify-center">
                             <PartyPopper size={18} className="text-accent-1" />
                         </div>
-                        <span>You're All Set</span>
+                        <span>You&apos;re All Set</span>
                     </div>
                 }
                 open={showCongrats}
@@ -293,7 +296,7 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
                             Tour Complete
                         </h3>
                         <p className="text-sm text-gray-500 leading-relaxed max-w-[300px] mx-auto">
-                            You've completed the tour. Start chatting with the AI or explore the Strategy Context Engine to unlock powerful insights.
+                            You&apos;ve completed the tour. Start chatting with the AI or explore the Strategy Context Engine to unlock powerful insights.
                         </p>
                     </div>
                 </div>

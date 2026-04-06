@@ -11,7 +11,6 @@ import { useChat, useGenerateKeywords } from '@/hooks/chat/useChat';
 import { Company } from '@/interface/Chat';
 import { useDrive } from '@/components/Providers/drive-provider';
 import { Navbar } from './components/Navbar';
-import { cn } from '@/utils/cn';
 import { useCompanies } from '@/hooks/chat/useCompanies';
 
 export default function ChatPage() {
@@ -21,27 +20,30 @@ export default function ChatPage() {
     const [mounted, setMounted] = useState(false);
 
     // Google Drive connection state (shared via context)
-    const { isDriveConnected, isDriveModalOpen, setIsDriveModalOpen, driveFiles } = useDrive();
+    const { isDriveConnected, setIsDriveModalOpen } = useDrive();
 
     const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
     const [selectedCompanies, setSelectedCompanies] = useState<Company[]>([]);
-    const { data: companies = [], isLoading: isCompaniesLoading } = useCompanies();
+    const { data: companies = [] } = useCompanies();
 
     const [isGeneratedQuestionsModalOpen, setIsGeneratedQuestionsModalOpen] = useState(false);
 
     const [customQuickQuestions, setCustomQuickQuestions] = useState<QuickQuestion[]>([]);
 
     useEffect(() => {
-        if (selectedCompanies.length > 0) {
-            const generated = getGeneratedQuestions(selectedCompanies).slice(0, 6);
-            const mapped = generated.map(q => ({
-                label: q.category,
-                prompt: q.question
-            }));
-            setCustomQuickQuestions(mapped);
-        } else {
-            setCustomQuickQuestions([]);
-        }
+        const timer = setTimeout(() => {
+            if (selectedCompanies.length > 0) {
+                const generated = getGeneratedQuestions(selectedCompanies).slice(0, 6);
+                const mapped = generated.map(q => ({
+                    label: q.category,
+                    prompt: q.question
+                }));
+                setCustomQuickQuestions(mapped);
+            } else {
+                setCustomQuickQuestions([]);
+            }
+        }, 0);
+        return () => clearTimeout(timer);
     }, [selectedCompanies]);
 
     const toggleCompanySelect = (company: Company) => {
@@ -67,7 +69,10 @@ export default function ChatPage() {
     }, [messages, isTyping]);
 
     useEffect(() => {
-        setMounted(true);
+        const timer = setTimeout(() => {
+            setMounted(true);
+        }, 0);
+        return () => clearTimeout(timer);
     }, []);
 
     const handleSendMessage = (text: string) => {
@@ -78,7 +83,7 @@ export default function ChatPage() {
     };
 
     // Actions
-    const [generatedKeywords, setGeneratedKeywords] = useState<any>(null);
+    const [generatedKeywords, setGeneratedKeywords] = useState<Record<string, unknown> | undefined>(undefined);
     const generateKeywordsMutation = useGenerateKeywords();
 
     const handleGenerateQuestions = async () => {
@@ -88,9 +93,9 @@ export default function ChatPage() {
         setIsGeneratedQuestionsModalOpen(true);
 
         try {
-            const companiesPayload = selectedCompanies;
+            const companiesPayload = selectedCompanies as unknown as Record<string, unknown>[];
             const data = await generateKeywordsMutation.mutateAsync(companiesPayload);
-            setGeneratedKeywords(data);
+            setGeneratedKeywords(data as Record<string, unknown>);
         } catch (error) {
             console.error("Failed to generate keywords:", error);
         }
@@ -144,7 +149,6 @@ export default function ChatPage() {
                             onSkip={handleSkip}
                             isDriveConnected={isDriveConnected}
                             onSuggestionClick={handleInsertQuestion}
-                            driveFiles={driveFiles}
                         />
                     ) : (
                         <ChatMessages

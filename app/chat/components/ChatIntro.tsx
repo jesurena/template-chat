@@ -14,7 +14,6 @@ interface ChatIntroProps {
     onSkip: () => void;
     isDriveConnected: boolean;
     onSuggestionClick: (prompt: string) => void;
-    driveFiles?: any[];
     companies: Company[];
 }
 
@@ -26,7 +25,6 @@ export function ChatIntro({
     onSkip,
     isDriveConnected,
     onSuggestionClick,
-    driveFiles = [],
     companies = []
 }: ChatIntroProps) {
     const dataSource = companies;
@@ -61,7 +59,7 @@ export function ChatIntro({
                         Where should we begin?
                     </h1>
                     <p className="text-gray-600 text-sm md:text-lg max-w-lg mx-auto leading-relaxed">
-                        I'm your assistant for project standards, component guidelines, and architectural best practices. How can I help you today?
+                        I&apos;m your assistant for project standards, component guidelines, and architectural best practices. How can I help you today?
                     </p>
                 </div>
 

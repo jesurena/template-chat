@@ -22,7 +22,7 @@ export const useGoogle = () => {
     };
 
     return {
-        login: async (credentialResponse: any) => {
+        login: async (credentialResponse: { credential?: string }) => {
             const token = credentialResponse.credential;
             if (!token) throw new Error('No credential token received');
             return loginMutation.mutateAsync(token);

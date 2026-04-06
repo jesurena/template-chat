@@ -38,3 +38,12 @@ export interface Company {
     key_objectives?: string;
     potentials_solutions?: string;
 }
+
+export interface ChatHistoryItem {
+    chat_id?: string;
+    id?: string;
+    ThreadID?: string;
+    content?: string;
+    message?: string;
+    [key: string]: unknown;
+}

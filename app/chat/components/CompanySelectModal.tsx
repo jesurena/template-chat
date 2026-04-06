@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Modal, Input, Button } from 'antd';
+import { Modal, Input } from 'antd';
 import { Search, Building2, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
 import { Company } from '@/interface/Chat';
 import { clsx, type ClassValue } from 'clsx';

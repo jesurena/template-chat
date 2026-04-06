@@ -1,4 +1,3 @@
-import { ChatMessage } from '@/interface/Chat';
 
 export interface MockChat {
     id: string;

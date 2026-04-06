@@ -7,7 +7,7 @@ import { twMerge } from 'tailwind-merge';
 import { Company } from '@/interface/Chat';
 import { CompanySelectModal } from './CompanySelectModal';
 import { Popover } from 'antd';
-import { useTheme } from '@/components/Providers/theme-provider';
+
 
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -46,7 +46,6 @@ export function ChatInput({
     onStop,
     companies
 }: ChatInputProps) {
-    const { theme } = useTheme();
     const [isPopoverOpen, setIsPopoverOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [mounted, setMounted] = useState(false);

@@ -12,7 +12,6 @@ import { Company } from '@/interface/Chat';
 import { useDrive } from '@/components/Providers/drive-provider';
 import { Navbar } from '../components/Navbar';
 import { useCompanies } from '@/hooks/chat/useCompanies';
-import { Loader2 } from 'lucide-react';
 
 export default function ChatHistoryPage() {
     const params = useParams();
@@ -23,9 +22,7 @@ export default function ChatHistoryPage() {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [mounted, setMounted] = useState(false);
     const { mutateAsync: fetchHistory } = useLoadChatHistory();
-    const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-
-    const { isDriveConnected, isDriveModalOpen, setIsDriveModalOpen, driveFiles } = useDrive();
+    const { isDriveConnected, setIsDriveModalOpen } = useDrive();
 
     const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
     const [selectedCompanies, setSelectedCompanies] = useState<Company[]>([]);
@@ -37,35 +34,34 @@ export default function ChatHistoryPage() {
     useEffect(() => {
         const loadInitialHistory = async () => {
             if (!chatId || (chatId === currentChatId && messages.length > 0)) {
-                setIsLoadingHistory(false);
                 return;
             }
 
             try {
-                setIsLoadingHistory(true);
                 const data = await fetchHistory(chatId);
                 loadChat(data.messages, data.chatId, data.sessionId);
             } catch (error) {
                 console.error("Failed to load chat history:", error);
-            } finally {
-                setIsLoadingHistory(false);
             }
         };
 
         loadInitialHistory();
-    }, [chatId, fetchHistory, loadChat]);
+    }, [chatId, fetchHistory, loadChat, currentChatId, messages.length]);
 
     useEffect(() => {
-        if (selectedCompanies.length > 0) {
-            const generated = getGeneratedQuestions(selectedCompanies).slice(0, 6);
-            const mapped = generated.map(q => ({
-                label: q.category,
-                prompt: q.question
-            }));
-            setCustomQuickQuestions(mapped);
-        } else {
-            setCustomQuickQuestions([]);
-        }
+        const timer = setTimeout(() => {
+            if (selectedCompanies.length > 0) {
+                const generated = getGeneratedQuestions(selectedCompanies).slice(0, 6);
+                const mapped = generated.map(q => ({
+                    label: q.category,
+                    prompt: q.question
+                }));
+                setCustomQuickQuestions(mapped);
+            } else {
+                setCustomQuickQuestions([]);
+            }
+        }, 0);
+        return () => clearTimeout(timer);
     }, [selectedCompanies]);
 
     const toggleCompanySelect = (company: Company) => {
@@ -91,7 +87,10 @@ export default function ChatHistoryPage() {
     }, [messages, isTyping]);
 
     useEffect(() => {
-        setMounted(true);
+        const timer = setTimeout(() => {
+            setMounted(true);
+        }, 0);
+        return () => clearTimeout(timer);
     }, []);
 
     const handleSendMessage = (text: string) => {
@@ -101,7 +100,7 @@ export default function ChatHistoryPage() {
         setInputValue('');
     };
 
-    const [generatedKeywords, setGeneratedKeywords] = useState<any>(null);
+    const [generatedKeywords, setGeneratedKeywords] = useState<Record<string, unknown> | undefined>(undefined);
     const generateKeywordsMutation = useGenerateKeywords();
 
     const handleGenerateQuestions = async () => {
@@ -111,9 +110,9 @@ export default function ChatHistoryPage() {
         setIsGeneratedQuestionsModalOpen(true);
 
         try {
-            const companiesPayload = selectedCompanies;
+            const companiesPayload = selectedCompanies as unknown as Record<string, unknown>[];
             const data = await generateKeywordsMutation.mutateAsync(companiesPayload);
-            setGeneratedKeywords(data);
+            setGeneratedKeywords(data as Record<string, unknown>);
         } catch (error) {
             console.error("Failed to generate keywords:", error);
         }

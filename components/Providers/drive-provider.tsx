@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { useDriveStatus, useDriveFiles } from '@/hooks/drive/useDriveQuery';
 import { DriveFile } from '@/interface/Drive';
 
@@ -18,12 +18,13 @@ const DriveContext = createContext<DriveContextType | undefined>(undefined);
 export function DriveProvider({ children }: { children: ReactNode }) {
     const [isDriveModalOpen, setIsDriveModalOpen] = useState(false);
     const [manualConnected, setManualConnected] = useState<boolean | null>(null);
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-
-    useEffect(() => {
-        const token = localStorage.getItem('jwt_token');
-        setIsAuthenticated(!!token);
-    }, []);
+    const [isAuthenticated] = useState<boolean>(() => {
+        if (typeof window !== 'undefined') {
+            const token = localStorage.getItem('jwt_token');
+            return !!token;
+        }
+        return false;
+    });
 
     const { data: driveStatusData } = useDriveStatus(isAuthenticated);
     const isDriveConnected = manualConnected ?? (driveStatusData?.status === "connected");

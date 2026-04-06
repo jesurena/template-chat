@@ -24,7 +24,7 @@ interface GeneratedQuestionsModalProps {
     onClose: () => void;
     onUseQuestion: (prompt: string) => void;
     selectedCompanies: Company[];
-    keywords?: any; // The new structure { "0": { company_name, keywords } }
+    keywords?: any;
     isLoadingKeywords?: boolean;
 }
 
@@ -157,9 +157,10 @@ export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, select
     const normalizedKeywords = React.useMemo(() => {
         if (!keywords) return DEFAULT_KEYWORDS;
         const all: string[] = [];
-        Object.values(keywords).forEach((entry: any) => {
-            if (entry.keywords && Array.isArray(entry.keywords)) {
-                all.push(...entry.keywords);
+        Object.values(keywords).forEach((entry: unknown) => {
+            const typedEntry = entry as { keywords?: string[] };
+            if (typedEntry.keywords && Array.isArray(typedEntry.keywords)) {
+                all.push(...typedEntry.keywords);
             }
         });
         return all.length > 0 ? Array.from(new Set(all)) : DEFAULT_KEYWORDS;
@@ -190,7 +191,7 @@ export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, select
         try {
             const result = await generateQuestionsMutation.mutateAsync({
                 keywords: selectedKeywords,
-                companiesPayload: selectedCompanies
+                companiesPayload: selectedCompanies as unknown as Record<string, unknown>[]
             });
 
             // Map API response to GeneratedQuestion[]
@@ -198,15 +199,16 @@ export function GeneratedQuestionsModal({ isOpen, onClose, onUseQuestion, select
             const flattenedQuestions: GeneratedQuestion[] = [];
 
             if (Array.isArray(result)) {
-                result.forEach((compData: any) => {
+                result.forEach((compData: { company_name?: string; questions?: Record<string, unknown> }) => {
                     if (compData.questions) {
-                        Object.entries(compData.questions).forEach(([keyword, qList]: [string, any]) => {
+                        const questionsObj = compData.questions;
+                        Object.entries(questionsObj).forEach(([keyword, qList]: [string, unknown]) => {
                             if (Array.isArray(qList)) {
-                                qList.forEach((q: any, idx: number) => {
+                                qList.forEach((q: { tag?: 'Risk Analysis' | 'Implementation' | 'Standardization' | 'Infrastructure' | 'Regulatory'; text: string }, idx: number) => {
                                     flattenedQuestions.push({
-                                        id: `${compData.company_name}-${keyword}-${idx}`,
+                                        id: `${compData.company_name || 'unknown'}-${keyword}-${idx}`,
                                         category: q.tag || 'Standardization',
-                                        targetCompany: compData.company_name,
+                                        targetCompany: compData.company_name || 'unknown',
                                         question: q.text
                                     });
                                 });
